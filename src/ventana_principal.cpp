@@ -1,46 +1,78 @@
 #include "ventana_principal.h"
+#include "filtros.h"
 #include "lista_productos.h"
 #include "ventana_perfil.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QComboBox>
 #include <QListWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
-#include <vector>
 
 VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *parent)
     : QWidget(parent), usuarioRegistrado(usuario)
 {
     setWindowTitle("Tienda en Línea");
-    resize(600, 400);
+    resize(700, 500);
 
-    // Lista de productos
     productos = obtenerListaProductos();
 
-    auto *layout = new QVBoxLayout(this);
-    lista = new QListWidget(this);
+    // Layout principal vertical
+    auto *layoutPrincipal = new QVBoxLayout(this);
 
-    for (const auto& prod : productos) {
+    // Layout horizontal para las opciones
+    auto *layoutOpciones = new QHBoxLayout;
+
+    // Combo de categorías
+    auto *comboCategorias = new QComboBox(this);
+    comboCategorias->addItem("Todas");
+    comboCategorias->addItem("Electrónica");
+    comboCategorias->addItem("Hogar y cocina");
+    comboCategorias->addItem("Moda y Accesorios");
+    comboCategorias->addItem("Deportes y Aire Libre");
+    comboCategorias->addItem("Cuidado personal y belleza");
+    layoutOpciones->addWidget(new QLabel("Categoría:", this));
+    layoutOpciones->addWidget(comboCategorias);
+
+    // Botón Comprar
+    auto *botonComprar = new QPushButton("Comprar", this);
+    layoutOpciones->addWidget(botonComprar);
+
+    // Botón Me gusta
+    auto *botonMeGusta = new QPushButton("Me gusta", this);
+    layoutOpciones->addWidget(botonMeGusta);
+
+    // Botón Información usuario
+    auto *botonInfoUsuario = new QPushButton("Información usuario", this);
+    layoutOpciones->addWidget(botonInfoUsuario);
+
+    // Agregar layout de opciones al principal
+    layoutPrincipal->addLayout(layoutOpciones);
+
+    // Lista de productos debajo
+    lista = new QListWidget(this);
+    layoutPrincipal->addWidget(lista);
+
+    setLayout(layoutPrincipal);
+
+    // Mostrar todos los productos al inicio
+    auto productosFiltrados = filtrarPorCategoria(productos, "Todas");
+    lista->clear();
+    for (const auto& prod : productosFiltrados) {
         lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
     }
 
-    layout->addWidget(new QLabel("Productos disponibles:", this));
-    layout->addWidget(lista);
-
-    // Botón para mostrar información del usuario
-    auto *botonInfoUsuario = new QPushButton("Información usuario", this);
-    layout->addWidget(botonInfoUsuario);
-
-    connect(botonInfoUsuario, &QPushButton::clicked, this, [this]() {
-        VentanaPerfil ventanaPerfil(usuarioRegistrado, this);
-        ventanaPerfil.setMinimumSize(300, 200);
-        ventanaPerfil.exec();
+    // Conectar cambio de categoría
+    connect(comboCategorias, &QComboBox::currentTextChanged, this, [this](const QString &categoria) {
+        auto productosFiltrados = filtrarPorCategoria(productos, categoria.toStdString());
+        lista->clear();
+        for (const auto& prod : productosFiltrados) {
+            lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+        }
     });
 
-    // Botón para comprar producto
-    auto *botonComprar = new QPushButton("Comprar", this);
-    layout->addWidget(botonComprar);
-
+    // Botón Comprar
     connect(botonComprar, &QPushButton::clicked, this, [this]() {
         int idx = lista->currentRow();
         if (idx >= 0) {
@@ -51,10 +83,7 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
         }
     });
 
-    // Botón para dar me gusta
-    auto *botonMeGusta = new QPushButton("Me gusta", this);
-    layout->addWidget(botonMeGusta);
-
+    // Botón Me gusta
     connect(botonMeGusta, &QPushButton::clicked, this, [this]() {
         int idx = lista->currentRow();
         if (idx >= 0) {
@@ -65,5 +94,10 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
         }
     });
 
-    setLayout(layout);
+    // Botón Información usuario
+    connect(botonInfoUsuario, &QPushButton::clicked, this, [this]() {
+        VentanaPerfil ventanaPerfil(usuarioRegistrado, this);
+        ventanaPerfil.setMinimumSize(300, 200);
+        ventanaPerfil.exec();
+    });
 }

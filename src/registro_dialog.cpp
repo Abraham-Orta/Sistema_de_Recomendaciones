@@ -1,15 +1,15 @@
 #include "registro_dialog.h"
-#include <QLineEdit>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QMessageBox>
 
 RegistroDialog::RegistroDialog(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle("Registro de Usuario");
-    resize(300, 200);
+    resize(600, 400);
 
     nombre = new QLineEdit(this);
     apellido = new QLineEdit(this);
@@ -25,8 +25,8 @@ RegistroDialog::RegistroDialog(QWidget *parent)
     auto *botonRegistrar = new QPushButton("Registrar", this);
     auto *botonCancelar = new QPushButton("Cancelar", this);
 
-    connect(botonRegistrar, &QPushButton::clicked, this, &QDialog::accept);
-    connect(botonCancelar, &QPushButton::clicked, this, &QDialog::reject);
+    connect(botonRegistrar, &QPushButton::clicked, this, &RegistroDialog::accept);
+    connect(botonCancelar, &QPushButton::clicked, this, &RegistroDialog::reject);
 
     auto *layoutFormulario = new QVBoxLayout;
     layoutFormulario->addWidget(etiquetaNombre);
@@ -44,6 +44,17 @@ RegistroDialog::RegistroDialog(QWidget *parent)
 
     layoutFormulario->addLayout(layoutBotones);
     setLayout(layoutFormulario);
+}
+
+void RegistroDialog::accept() {
+    if (nombre->text().isEmpty() ||
+        apellido->text().isEmpty() ||
+        id->text().isEmpty() ||
+        contrasena->text().isEmpty()) {
+        QMessageBox::warning(this, "Campos incompletos", "Por favor, completa todos los campos para registrarte.");
+        return;
+    }
+    QDialog::accept();
 }
 
 perfil_usuario RegistroDialog::obtenerPerfil() const {
