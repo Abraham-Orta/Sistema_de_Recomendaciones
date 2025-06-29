@@ -51,21 +51,28 @@ Este proyecto es una aplicación de escritorio desarrollada en C++ y Qt que simu
 ```
 ├── include/                # Archivos de cabecera (.h)
 │   ├── arbol_usuarios.h
-│   ├── perfil_usuario.h
-│   ├── producto.h
+│   ├── dialogo_registro_nuevo.h
+│   ├── filtros.h
+│   ├── lista_productos.h
 │   ├── nodo_string.h
+│   ├── perfil_usuario.h
 │   ├── preferencias_producto.h
+│   ├── producto.h
 │   ├── recomendaciones.h
-│   └── ...
+│   ├── registro_dialog.h
+│   ├── ventana_inicial.h
+│   ├── ventana_perfil.h
+│   ├── ventana_principal.h
+│   └── catch.hpp
 ├── src/                    # Archivos fuente (.cpp)
-│   ├── main.cpp
-│   ├── ventana_principal.cpp
-│   ├── registro_dialog.cpp
-│   ├── ventana_perfil.cpp
 │   ├── arbol_usuarios.cpp
-│   ├── ventana_inicial.cpp
 │   ├── dialogo_registro_nuevo.cpp
-│   └── ...
+│   ├── main.cpp
+│   ├── registro_dialog.cpp
+│   ├── test_filtros.cpp
+│   ├── ventana_inicial.cpp
+│   ├── ventana_perfil.cpp
+│   └── ventana_principal.cpp
 ├── CMakeLists.txt          # Configuración de compilación
 ├── README.md               # Este archivo
 └── ...
