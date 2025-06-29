@@ -9,20 +9,13 @@ struct NodoUsuario {
     NodoUsuario* derecha = nullptr;
 };
 
-class ArbolUsuarios {
-public:
-    ArbolUsuarios() : raiz(nullptr) {}
-    ~ArbolUsuarios();
+struct ArbolUsuarios {
+    NodoUsuario* raiz = nullptr;
 
     void insertar(const perfil_usuario& perfil);
-    perfil_usuario* buscar(const std::string& nombreUsuario);
-
-private:
-    NodoUsuario* raiz;
-
+    NodoUsuario* buscar(const std::string& nombreUsuario);
     void destruir(NodoUsuario* nodo);
-    NodoUsuario* insertar(NodoUsuario* nodo, const perfil_usuario& perfil);
-    perfil_usuario* buscar(NodoUsuario* nodo, const std::string& nombreUsuario);
+    ~ArbolUsuarios();
 };
 
 #endif

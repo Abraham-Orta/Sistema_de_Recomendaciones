@@ -1,7 +1,27 @@
 #include "arbol_usuarios.h"
 
-ArbolUsuarios::~ArbolUsuarios() {
-    destruir(raiz);
+void ArbolUsuarios::insertar(const perfil_usuario& perfil) {
+    NodoUsuario** actual = &raiz;
+    while (*actual) {
+        if (perfil.usuario < (*actual)->perfil.usuario)
+            actual = &((*actual)->izquierda);
+        else
+            actual = &((*actual)->derecha);
+    }
+    *actual = new NodoUsuario{perfil, nullptr, nullptr};
+}
+
+NodoUsuario* ArbolUsuarios::buscar(const std::string& nombreUsuario) {
+    NodoUsuario* actual = raiz;
+    while (actual) {
+        if (nombreUsuario == actual->perfil.usuario)
+            return actual;
+        if (nombreUsuario < actual->perfil.usuario)
+            actual = actual->izquierda;
+        else
+            actual = actual->derecha;
+    }
+    return nullptr;
 }
 
 void ArbolUsuarios::destruir(NodoUsuario* nodo) {
@@ -12,40 +32,6 @@ void ArbolUsuarios::destruir(NodoUsuario* nodo) {
     }
 }
 
-void ArbolUsuarios::insertar(const perfil_usuario& perfil) {
-    raiz = insertar(raiz, perfil);
-}
-
-NodoUsuario* ArbolUsuarios::insertar(NodoUsuario* nodo, const perfil_usuario& perfil) {
-    if (!nodo) {
-        NodoUsuario* nuevoNodo = new NodoUsuario;
-        nuevoNodo->perfil = perfil;
-        return nuevoNodo;
-    }
-
-    if (perfil.usuario < nodo->perfil.usuario) {
-        nodo->izquierda = insertar(nodo->izquierda, perfil);
-    } else if (perfil.usuario > nodo->perfil.usuario) {
-        nodo->derecha = insertar(nodo->derecha, perfil);
-    }
-
-    return nodo;
-}
-
-perfil_usuario* ArbolUsuarios::buscar(const std::string& nombreUsuario) {
-    return buscar(raiz, nombreUsuario);
-}
-
-perfil_usuario* ArbolUsuarios::buscar(NodoUsuario* nodo, const std::string& nombreUsuario) {
-    if (!nodo) {
-        return nullptr;
-    }
-
-    if (nombreUsuario == nodo->perfil.usuario) {
-        return &nodo->perfil;
-    } else if (nombreUsuario < nodo->perfil.usuario) {
-        return buscar(nodo->izquierda, nombreUsuario);
-    } else {
-        return buscar(nodo->derecha, nombreUsuario);
-    }
+ArbolUsuarios::~ArbolUsuarios() {
+    destruir(raiz);
 }

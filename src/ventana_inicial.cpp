@@ -27,11 +27,11 @@ VentanaInicial::VentanaInicial(ArbolUsuarios* arbol, QWidget *parent)
 void VentanaInicial::abrirDialogoLogin() {
     RegistroDialog dialogoLogin(arbolUsuarios, this);
     if (dialogoLogin.exec() == QDialog::Accepted) {
-        perfil_usuario* usuario = arbolUsuarios->buscar(dialogoLogin.obtenerUsuario());
-        if (usuario && usuario->contraseña == dialogoLogin.obtenerContraseña()) {
-            hide(); // Ocultamos la ventana inicial en lugar de cerrarla
-            VentanaPrincipal *tienda = new VentanaPrincipal(*usuario);
-            tienda->setAttribute(Qt::WA_DeleteOnClose); // Asegurarse de que se destruya al cerrar
+        NodoUsuario* nodo = arbolUsuarios->buscar(dialogoLogin.obtenerUsuario());
+        if (nodo && nodo->perfil.contraseña == dialogoLogin.obtenerContraseña()) {
+            hide();
+            VentanaPrincipal *tienda = new VentanaPrincipal(nodo->perfil);
+            tienda->setAttribute(Qt::WA_DeleteOnClose);
             connect(tienda, &VentanaPrincipal::destroyed, this, &VentanaInicial::show);
             tienda->show();
         } else {
