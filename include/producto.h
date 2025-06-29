@@ -10,6 +10,7 @@ struct Producto {
     std::string categoria;
     std::string id; // Código único del producto    
     double precio;
+    int calificacion; // Calificación del producto (0.0 a 5.0)
 };
 
 #endif // PRODUCTO_H

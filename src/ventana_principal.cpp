@@ -2,6 +2,7 @@
 #include "filtros.h"
 #include "lista_productos.h"
 #include "ventana_perfil.h"
+#include "recomendaciones.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
@@ -27,6 +28,7 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
     // Combo de categorías
     auto *comboCategorias = new QComboBox(this);
     comboCategorias->addItem("Todas");
+    comboCategorias->addItem("Recomendaciones");
     comboCategorias->addItem("Electrónica");
     comboCategorias->addItem("Hogar y cocina");
     comboCategorias->addItem("Moda y Accesorios");
@@ -47,6 +49,10 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
     auto *botonInfoUsuario = new QPushButton("Información usuario", this);
     layoutOpciones->addWidget(botonInfoUsuario);
 
+    // Botón Cerrar Sesión
+    auto *botonCerrarSesion = new QPushButton("Cerrar Sesión", this);
+    layoutOpciones->addWidget(botonCerrarSesion);
+
     // Agregar layout de opciones al principal
     layoutPrincipal->addLayout(layoutOpciones);
 
@@ -65,18 +71,30 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
 
     // Conectar cambio de categoría
     connect(comboCategorias, &QComboBox::currentTextChanged, this, [this](const QString &categoria) {
-        auto productosFiltrados = filtrarPorCategoria(productos, categoria.toStdString());
-        lista->clear();
-        for (const auto& prod : productosFiltrados) {
-            lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+        if (categoria == "Recomendaciones") {
+            auto recomendados = recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25);
+            lista->clear();
+            for (const auto& prod : recomendados) {
+                lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+            }
+        } else {
+            auto productosFiltrados = filtrarPorCategoria(productos, categoria.toStdString());
+            lista->clear();
+            for (const auto& prod : productosFiltrados) {
+                lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+            }
         }
     });
 
     // Botón Comprar
-    connect(botonComprar, &QPushButton::clicked, this, [this]() {
+    connect(botonComprar, &QPushButton::clicked, this, [this, comboCategorias]() {
         int idx = lista->currentRow();
         if (idx >= 0) {
-            productosComprados.push_back(productos[idx]);
+            auto categoriaActual = comboCategorias->currentText().toStdString();
+            auto productosMostrados = (categoriaActual == "Recomendaciones")
+                                        ? recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25)
+                                        : filtrarPorCategoria(productos, categoriaActual);
+            usuarioRegistrado.productos_comprados.agregar(productosMostrados[idx].id);
             QMessageBox::information(this, "Compra", "¡Producto comprado!");
         } else {
             QMessageBox::warning(this, "Compra", "Selecciona un producto para comprar.");
@@ -84,10 +102,14 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
     });
 
     // Botón Me gusta
-    connect(botonMeGusta, &QPushButton::clicked, this, [this]() {
+    connect(botonMeGusta, &QPushButton::clicked, this, [this, comboCategorias]() {
         int idx = lista->currentRow();
         if (idx >= 0) {
-            productosFavoritos.push_back(productos[idx]);
+            auto categoriaActual = comboCategorias->currentText().toStdString();
+            auto productosMostrados = (categoriaActual == "Recomendaciones")
+                                        ? recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25)
+                                        : filtrarPorCategoria(productos, categoriaActual);
+            usuarioRegistrado.productos_favoritos.agregar(productosMostrados[idx].id);
             QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
         } else {
             QMessageBox::warning(this, "Me gusta", "Selecciona un producto para dar me gusta.");
@@ -100,4 +122,7 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
         ventanaPerfil.setMinimumSize(300, 200);
         ventanaPerfil.exec();
     });
+
+    // Botón Cerrar Sesión
+    connect(botonCerrarSesion, &QPushButton::clicked, this, &VentanaPrincipal::close);
 }

@@ -4,22 +4,23 @@
 #include <QDialog>
 #include <QLineEdit>
 #include "perfil_usuario.h"
+#include "arbol_usuarios.h"
 
 class RegistroDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit RegistroDialog(QWidget *parent = nullptr);
+    explicit RegistroDialog(ArbolUsuarios* arbol, QWidget *parent = nullptr);
 
-    perfil_usuario obtenerPerfil() const;
+    std::string obtenerUsuario() const;
+    std::string obtenerContraseña() const;
 
 protected:
-    void accept() override; // Sobrescribimos accept para validar
+    void accept() override;
 
 private:
-    QLineEdit *nombre;
-    QLineEdit *apellido;
-    QLineEdit *id;
+    QLineEdit *usuario;
     QLineEdit *contrasena;
+    ArbolUsuarios* arbolUsuarios;
 };
 
-#endif // REGISTRO_DIALOG_H
+#endif

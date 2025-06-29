@@ -12,12 +12,11 @@ class VentanaPrincipal : public QWidget {
 public:
     explicit VentanaPrincipal(const perfil_usuario& usuario, QWidget *parent = nullptr);
 
+
 private:
     perfil_usuario usuarioRegistrado;
     std::vector<Producto> productos;
-    std::vector<Producto> productosComprados;
-    std::vector<Producto> productosFavoritos;
     QListWidget *lista;
 };
 
-#endif
+#endif // VENTANA_PRINCIPAL_H

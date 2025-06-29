@@ -18,8 +18,15 @@ include_directories(include)
 file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
 
 # Archivos fuente de la aplicación principal (excluyendo test_filtros.cpp)
-file(GLOB SRC_FILES "src/*.cpp")
-list(REMOVE_ITEM SRC_FILES "${CMAKE_SOURCE_DIR}/src/test_filtros.cpp")
+set(SRC_FILES
+    src/main.cpp
+    src/ventana_principal.cpp
+    src/registro_dialog.cpp
+    src/ventana_perfil.cpp
+    src/arbol_usuarios.cpp
+    src/ventana_inicial.cpp
+    src/dialogo_registro_nuevo.cpp
+)
 
 # Ejecutable principal
 add_executable(sistema_de_recomendaciones ${SRC_FILES} ${HEADERS})

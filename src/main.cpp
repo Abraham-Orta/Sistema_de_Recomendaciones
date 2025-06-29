@@ -1,17 +1,23 @@
 #include <QApplication>
-#include "registro_dialog.h"
-#include "ventana_principal.h"
+#include "ventana_inicial.h"
+#include "arbol_usuarios.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
-    RegistroDialog registro;
-    if (registro.exec() == QDialog::Accepted) {
-        perfil_usuario nuevoUsuario = registro.obtenerPerfil();
-        VentanaPrincipal tienda(nuevoUsuario);
-        tienda.show();
-        return app.exec();
-    }
+    ArbolUsuarios arbolUsuarios;
 
-    return 0;
+    // Usuario de prueba
+    perfil_usuario usuarioPrueba;
+    usuarioPrueba.nombre = "Abraham";
+    usuarioPrueba.apellido = "Lira";
+    usuarioPrueba.id = "1";
+    usuarioPrueba.usuario = "alira";
+    usuarioPrueba.contraseña = "1234";
+    arbolUsuarios.insertar(usuarioPrueba);
+
+    VentanaInicial ventanaInicial(&arbolUsuarios);
+    ventanaInicial.show();
+
+    return app.exec();
 }
