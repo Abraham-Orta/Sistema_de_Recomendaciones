@@ -11,7 +11,11 @@
 #include <QPushButton>
 #include <QMessageBox>
 
-VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *parent)
+void VentanaPrincipal::actualizarRecomendaciones() {
+    recomendarProductos(usuarioRegistrado.productos_recomendados, productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25);
+}
+
+VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     : QWidget(parent), usuarioRegistrado(usuario)
 {
     setWindowTitle("Tienda en Línea");
@@ -62,6 +66,8 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
 
     setLayout(layoutPrincipal);
 
+    actualizarRecomendaciones();
+
     // Mostrar todos los productos al inicio
     auto productosFiltrados = filtrarPorCategoria(productos, "Todas");
     lista->clear();
@@ -72,10 +78,14 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
     // Conectar cambio de categoría
     connect(comboCategorias, &QComboBox::currentTextChanged, this, [this](const QString &categoria) {
         if (categoria == "Recomendaciones") {
-            auto recomendados = recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25);
             lista->clear();
-            for (const auto& prod : recomendados) {
-                lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+            for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
+                for (const auto& prod : productos) {
+                    if (prod.id == nodo->valor) {
+                        lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+                        break;
+                    }
+                }
             }
         } else {
             auto productosFiltrados = filtrarPorCategoria(productos, categoria.toStdString());
@@ -91,10 +101,20 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
         int idx = lista->currentRow();
         if (idx >= 0) {
             auto categoriaActual = comboCategorias->currentText().toStdString();
-            auto productosMostrados = (categoriaActual == "Recomendaciones")
-                                        ? recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25)
-                                        : filtrarPorCategoria(productos, categoriaActual);
-            usuarioRegistrado.productos_comprados.agregar(productosMostrados[idx].id);
+            if (categoriaActual == "Recomendaciones") {
+                int i = 0;
+                for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
+                    if (i == idx) {
+                        usuarioRegistrado.productos_comprados.agregar(nodo->valor);
+                        break;
+                    }
+                    i++;
+                }
+            } else {
+                auto productosFiltrados = filtrarPorCategoria(productos, categoriaActual);
+                usuarioRegistrado.productos_comprados.agregar(productosFiltrados[idx].id);
+            }
+            actualizarRecomendaciones();
             QMessageBox::information(this, "Compra", "¡Producto comprado!");
         } else {
             QMessageBox::warning(this, "Compra", "Selecciona un producto para comprar.");
@@ -106,10 +126,20 @@ VentanaPrincipal::VentanaPrincipal(const perfil_usuario& usuario, QWidget *paren
         int idx = lista->currentRow();
         if (idx >= 0) {
             auto categoriaActual = comboCategorias->currentText().toStdString();
-            auto productosMostrados = (categoriaActual == "Recomendaciones")
-                                        ? recomendarProductos(productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25)
-                                        : filtrarPorCategoria(productos, categoriaActual);
-            usuarioRegistrado.productos_favoritos.agregar(productosMostrados[idx].id);
+            if (categoriaActual == "Recomendaciones") {
+                int i = 0;
+                for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
+                    if (i == idx) {
+                        usuarioRegistrado.productos_favoritos.agregar(nodo->valor);
+                        break;
+                    }
+                    i++;
+                }
+            } else {
+                auto productosFiltrados = filtrarPorCategoria(productos, categoriaActual);
+                usuarioRegistrado.productos_favoritos.agregar(productosFiltrados[idx].id);
+            }
+            actualizarRecomendaciones();
             QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
         } else {
             QMessageBox::warning(this, "Me gusta", "Selecciona un producto para dar me gusta.");

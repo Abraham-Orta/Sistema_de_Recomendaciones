@@ -10,9 +10,9 @@ int main(int argc, char *argv[]) {
     // Usuario de prueba
     perfil_usuario usuarioPrueba;
     usuarioPrueba.nombre = "Abraham";
-    usuarioPrueba.apellido = "Lira";
+    usuarioPrueba.apellido = "Orta";
     usuarioPrueba.id = "1";
-    usuarioPrueba.usuario = "alira";
+    usuarioPrueba.usuario = "abraham33";
     usuarioPrueba.contraseña = "1234";
     arbolUsuarios.insertar(usuarioPrueba);
 

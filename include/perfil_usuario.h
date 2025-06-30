@@ -17,6 +17,7 @@ struct perfil_usuario {
 
     ListaEnlazadaString productos_comprados;
     ListaEnlazadaString productos_favoritos;
+    ListaEnlazadaString productos_recomendados;
 };
 
 #endif

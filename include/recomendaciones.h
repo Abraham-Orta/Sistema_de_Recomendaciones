@@ -10,13 +10,17 @@
 
 #include "nodo_string.h"
 
-std::vector<Producto> recomendarProductos(
+void recomendarProductos(
+    ListaEnlazadaString& recomendados,
     const std::vector<Producto>& todos,
     const ListaEnlazadaString& comprados,
     const ListaEnlazadaString& favoritos,
     size_t maxRecomendaciones = 5)
 {
-    // 1. Obtener las categorías de interés del usuario
+    // 1. Limpiar recomendaciones anteriores
+    recomendados.limpiar();
+
+    // 2. Obtener las categorías de interés del usuario
     std::vector<std::string> categorias;
     for (NodoString* nodo = comprados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
         for (const auto& p : todos) {
@@ -50,7 +54,7 @@ std::vector<Producto> recomendarProductos(
         });
 
     // 4. Recomendar productos de las categorías más frecuentes que no estén en comprados/favoritos
-    std::vector<Producto> recomendados;
+    size_t count = 0;
     for (const auto& cat : categoriasOrdenadas) {
         for (const auto& prod : todos) {
             bool yaTiene = false;
@@ -59,13 +63,13 @@ std::vector<Producto> recomendarProductos(
             for (NodoString* nodo = favoritos.cabeza; nodo != nullptr; nodo = nodo->siguiente)
                 if (nodo->valor == prod.id) yaTiene = true;
             if (prod.categoria == cat && !yaTiene) {
-                recomendados.push_back(prod);
-                if (recomendados.size() >= maxRecomendaciones)
-                    return recomendados;
+                recomendados.agregar(prod.id);
+                count++;
+                if (count >= maxRecomendaciones)
+                    return;
             }
         }
     }
-    return recomendados;
 }
 
 #endif // RECOMENDACIONES_H
