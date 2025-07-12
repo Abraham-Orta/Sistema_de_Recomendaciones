@@ -4,9 +4,9 @@
 
 TEST_CASE("Filtrar productos por categoría", "[filtrarPorCategoria]") {
     std::vector<Producto> productos = {
-        {"Laptop", "Portátil", "Dell", "Electrónica", "P001", 15000.0},
-        {"Cafetera", "Cafetera automática", "DeLonghi", "Hogar y cocina", "H001", 3500.0},
-        {"Camiseta", "Camiseta de algodón", "H&M", "Moda y Accesorios", "M001", 250.0}
+        {"Laptop", "Portátil", "Dell", "Electrónica", "P001", "", 15000.0},
+        {"Cafetera", "Cafetera automática", "DeLonghi", "Hogar y cocina", "H001", "", 3500.0},
+        {"Camiseta", "Camiseta de algodón", "H&M", "Moda y Accesorios", "M001", "", 250.0}
     };
 
     SECTION("Filtrar Electrónica") {

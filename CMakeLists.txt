@@ -26,10 +26,11 @@ set(SRC_FILES
     src/arbol_usuarios.cpp
     src/ventana_inicial.cpp
     src/dialogo_registro_nuevo.cpp
+    src/preferencias_dialogo.cpp
 )
 
 # Ejecutable principal
-add_executable(sistema_de_recomendaciones ${SRC_FILES} ${HEADERS})
+add_executable(sistema_de_recomendaciones ${SRC_FILES} ${HEADERS} resources.qrc)
 target_link_libraries(sistema_de_recomendaciones Qt6::Widgets)
 
 # Ejecutable para pruebas unitarias

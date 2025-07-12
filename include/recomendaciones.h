@@ -15,10 +15,45 @@ void recomendarProductos(
     const std::vector<Producto>& todos,
     const ListaEnlazadaString& comprados,
     const ListaEnlazadaString& favoritos,
+    const PreferenciasProducto& preferencias,
     size_t maxRecomendaciones = 5)
 {
     // 1. Limpiar recomendaciones anteriores
     recomendados.limpiar();
+
+    // Si no hay historial, usar preferencias
+    if (comprados.cabeza == nullptr && favoritos.cabeza == nullptr) {
+        size_t count = 0;
+        for (NodoString* nodoCat = preferencias.categorias.cabeza; nodoCat != nullptr; nodoCat = nodoCat->siguiente) {
+            for (const auto& prod : todos) {
+                if (prod.categoria == nodoCat->valor) {
+                    recomendados.agregar(prod.id);
+                    count++;
+                    if (count >= maxRecomendaciones) return;
+                }
+            }
+        }
+        for (NodoString* nodoMarca = preferencias.marcas.cabeza; nodoMarca != nullptr; nodoMarca = nodoMarca->siguiente) {
+            for (const auto& prod : todos) {
+                if (prod.marca == nodoMarca->valor) {
+                    bool yaRecomendado = false;
+                    for (NodoString* rec = recomendados.cabeza; rec != nullptr; rec = rec->siguiente) {
+                        if (rec->valor == prod.id) {
+                            yaRecomendado = true;
+                            break;
+                        }
+                    }
+                    if (!yaRecomendado) {
+                        recomendados.agregar(prod.id);
+                        count++;
+                        if (count >= maxRecomendaciones) return;
+                    }
+                }
+            }
+        }
+        return;
+    }
+
 
     // 2. Obtener las categorías de interés del usuario
     std::vector<std::string> categorias;

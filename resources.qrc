@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/B001.jpg</file>
+        <file>img/D001.jpg</file>
+        <file>img/E001.jpg</file>
+        <file>img/E002.jpg</file>
+        <file>img/H001.jpg</file>
+        <file>img/M001.jpg</file>
+        <file>img/placeholder.jpg</file>
+        <file>styles.qss</file>
+    </qresource>
+</RCC>

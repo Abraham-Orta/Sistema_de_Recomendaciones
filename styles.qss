@@ -1,0 +1,75 @@
+
+/* Estilo general para la aplicación - Tema Oscuro Moderno */
+
+QWidget {
+    background-color: #2E3440; /* Fondo principal oscuro (Nord Polar Night) */
+    color: #ECEFF4; /* Color de texto claro (Nord Snow Storm) */
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para los botones */
+QPushButton {
+    background-color: #5E81AC; /* Azul (Nord Frost) */
+    color: #ECEFF4;
+    border: 1px solid #4C566A;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #81A1C1; /* Azul más claro al pasar el mouse */
+}
+
+QPushButton:pressed {
+    background-color: #4C566A; /* Azul más oscuro al presionar */
+}
+
+/* Estilo para las etiquetas */
+QLabel {
+    background-color: transparent; /* Fondo transparente para etiquetas */
+    padding: 2px;
+}
+
+/* Estilo para ComboBox */
+QComboBox {
+    background-color: #434C5E;
+    border: 1px solid #4C566A;
+    border-radius: 4px;
+    padding: 4px;
+    min-width: 6em;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left-width: 1px;
+    border-left-color: #4C566A;
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    image: url(:/img/down_arrow.png); /* Opcional: usar una imagen para la flecha */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #434C5E;
+    border: 1px solid #4C566A;
+    selection-background-color: #5E81AC;
+}
+
+/* Estilo para ScrollArea */
+QScrollArea {
+    border: none; /* Sin borde para el área de scroll */
+}
+
+/* Estilo para las tarjetas de producto */
+/* Asumiendo que las tarjetas son QWidget dentro del QGridLayout */
+QScrollArea > QWidget > QWidget > QWidget {
+    background-color: #3B4252; /* Fondo ligeramente más claro para las tarjetas */
+    border: 1px solid #4C566A;
+    border-radius: 8px;
+}

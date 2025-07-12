@@ -8,7 +8,8 @@ struct Producto {
     std::string descripcion;
     std::string marca;
     std::string categoria;
-    std::string id; // Código único del producto    
+    std::string id; // Código único del producto
+    std::string ruta_imagen;
     double precio;
     int calificacion; // Calificación del producto (0.0 a 5.0)
 };

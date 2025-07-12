@@ -6,13 +6,77 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
-#include <QListWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QScrollArea>
+#include <QGridLayout>
+#include <QWidget>
+
+void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMostrados) {
+    // Limpiar el layout anterior
+    QLayoutItem* item;
+    while ((item = gridLayout->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
+
+    int fila = 0;
+    int col = 0;
+    for (const auto& prod : productosMostrados) {
+        // Crear la tarjeta del producto
+        QWidget* tarjeta = new QWidget;
+        QVBoxLayout* layoutTarjeta = new QVBoxLayout(tarjeta);
+
+        // Imagen
+        QLabel* imagen = new QLabel;
+        QPixmap pixmap(QString::fromStdString(":/" + prod.ruta_imagen));
+        if (pixmap.isNull()) {
+            // Si no hay imagen, mostrar un placeholder
+            pixmap.load(":/img/placeholder.jpg");
+        }
+        imagen->setPixmap(pixmap.scaled(150, 150, Qt::KeepAspectRatio));
+        layoutTarjeta->addWidget(imagen);
+
+        // Nombre
+        QLabel* nombre = new QLabel(QString::fromStdString(prod.nombre));
+        layoutTarjeta->addWidget(nombre);
+
+        // Precio
+        QLabel* precio = new QLabel(QString::fromStdString("$" + std::to_string(prod.precio)));
+        layoutTarjeta->addWidget(precio);
+
+        // Botones
+        QHBoxLayout* layoutBotones = new QHBoxLayout;
+        QPushButton* botonComprar = new QPushButton("Comprar");
+        QPushButton* botonMeGusta = new QPushButton("Me gusta");
+        layoutBotones->addWidget(botonComprar);
+        layoutBotones->addWidget(botonMeGusta);
+        layoutTarjeta->addLayout(layoutBotones);
+
+        // Conectar botones
+        connect(botonComprar, &QPushButton::clicked, this, [this, prod]() {
+            usuarioRegistrado.productos_comprados.agregar(prod.id);
+            actualizarRecomendaciones();
+            QMessageBox::information(this, "Compra", "¡Producto comprado!");
+        });
+        connect(botonMeGusta, &QPushButton::clicked, this, [this, prod]() {
+            usuarioRegistrado.productos_favoritos.agregar(prod.id);
+            actualizarRecomendaciones();
+            QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
+        });
+
+        gridLayout->addWidget(tarjeta, fila, col);
+        col++;
+        if (col == 4) {
+            col = 0;
+            fila++;
+        }
+    }
+}
 
 void VentanaPrincipal::actualizarRecomendaciones() {
-    recomendarProductos(usuarioRegistrado.productos_recomendados, productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, 25);
+    recomendarProductos(usuarioRegistrado.productos_recomendados, productos, usuarioRegistrado.productos_comprados, usuarioRegistrado.productos_favoritos, usuarioRegistrado.preferencias, 25);
 }
 
 VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
@@ -41,13 +105,7 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     layoutOpciones->addWidget(new QLabel("Categoría:", this));
     layoutOpciones->addWidget(comboCategorias);
 
-    // Botón Comprar
-    auto *botonComprar = new QPushButton("Comprar", this);
-    layoutOpciones->addWidget(botonComprar);
-
-    // Botón Me gusta
-    auto *botonMeGusta = new QPushButton("Me gusta", this);
-    layoutOpciones->addWidget(botonMeGusta);
+    
 
     // Botón Información usuario
     auto *botonInfoUsuario = new QPushButton("Información usuario", this);
@@ -60,89 +118,36 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     // Agregar layout de opciones al principal
     layoutPrincipal->addLayout(layoutOpciones);
 
-    // Lista de productos debajo
-    lista = new QListWidget(this);
-    layoutPrincipal->addWidget(lista);
+    // ScrollArea para los productos
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    QWidget* widgetContenedor = new QWidget;
+    gridLayout = new QGridLayout(widgetContenedor);
+    scrollArea->setWidget(widgetContenedor);
+    layoutPrincipal->addWidget(scrollArea);
 
     setLayout(layoutPrincipal);
 
     actualizarRecomendaciones();
 
     // Mostrar todos los productos al inicio
-    auto productosFiltrados = filtrarPorCategoria(productos, "Todas");
-    lista->clear();
-    for (const auto& prod : productosFiltrados) {
-        lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
-    }
+    mostrarProductos(filtrarPorCategoria(productos, "Todas"));
 
     // Conectar cambio de categoría
     connect(comboCategorias, &QComboBox::currentTextChanged, this, [this](const QString &categoria) {
         if (categoria == "Recomendaciones") {
-            lista->clear();
+            std::vector<Producto> recomendados;
             for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
                 for (const auto& prod : productos) {
                     if (prod.id == nodo->valor) {
-                        lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
+                        recomendados.push_back(prod);
                         break;
                     }
                 }
             }
+            mostrarProductos(recomendados);
         } else {
-            auto productosFiltrados = filtrarPorCategoria(productos, categoria.toStdString());
-            lista->clear();
-            for (const auto& prod : productosFiltrados) {
-                lista->addItem(QString::fromStdString(prod.nombre + " - $" + std::to_string(prod.precio)));
-            }
-        }
-    });
-
-    // Botón Comprar
-    connect(botonComprar, &QPushButton::clicked, this, [this, comboCategorias]() {
-        int idx = lista->currentRow();
-        if (idx >= 0) {
-            auto categoriaActual = comboCategorias->currentText().toStdString();
-            if (categoriaActual == "Recomendaciones") {
-                int i = 0;
-                for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
-                    if (i == idx) {
-                        usuarioRegistrado.productos_comprados.agregar(nodo->valor);
-                        break;
-                    }
-                    i++;
-                }
-            } else {
-                auto productosFiltrados = filtrarPorCategoria(productos, categoriaActual);
-                usuarioRegistrado.productos_comprados.agregar(productosFiltrados[idx].id);
-            }
-            actualizarRecomendaciones();
-            QMessageBox::information(this, "Compra", "¡Producto comprado!");
-        } else {
-            QMessageBox::warning(this, "Compra", "Selecciona un producto para comprar.");
-        }
-    });
-
-    // Botón Me gusta
-    connect(botonMeGusta, &QPushButton::clicked, this, [this, comboCategorias]() {
-        int idx = lista->currentRow();
-        if (idx >= 0) {
-            auto categoriaActual = comboCategorias->currentText().toStdString();
-            if (categoriaActual == "Recomendaciones") {
-                int i = 0;
-                for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
-                    if (i == idx) {
-                        usuarioRegistrado.productos_favoritos.agregar(nodo->valor);
-                        break;
-                    }
-                    i++;
-                }
-            } else {
-                auto productosFiltrados = filtrarPorCategoria(productos, categoriaActual);
-                usuarioRegistrado.productos_favoritos.agregar(productosFiltrados[idx].id);
-            }
-            actualizarRecomendaciones();
-            QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
-        } else {
-            QMessageBox::warning(this, "Me gusta", "Selecciona un producto para dar me gusta.");
+            mostrarProductos(filtrarPorCategoria(productos, categoria.toStdString()));
         }
     });
 

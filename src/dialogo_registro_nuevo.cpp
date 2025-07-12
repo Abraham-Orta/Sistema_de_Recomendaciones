@@ -1,4 +1,5 @@
 #include "dialogo_registro_nuevo.h"
+#include "preferencias_dialogo.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -59,6 +60,23 @@ void DialogoRegistroNuevo::accept() {
     nuevoPerfil.contraseña = contrasena->text().toStdString();
 
     arbolUsuarios->insertar(nuevoPerfil);
+
+    PreferenciasDialogo dialogoPreferencias(this);
+    if (dialogoPreferencias.exec() == QDialog::Accepted) {
+        auto categorias = dialogoPreferencias.getCategoriasSeleccionadas();
+        auto marcas = dialogoPreferencias.getMarcasSeleccionadas();
+        
+        NodoUsuario* nodo = arbolUsuarios->buscar(nuevoPerfil.usuario);
+        if (nodo) {
+            for (const auto& cat : categorias) {
+                nodo->perfil.preferencias.agregarCategoria(cat);
+            }
+            for (const auto& marca : marcas) {
+                nodo->perfil.preferencias.agregarMarca(marca);
+            }
+        }
+    }
+
     QMessageBox::information(this, "Éxito", "Usuario registrado correctamente.");
     QDialog::accept();
 }
