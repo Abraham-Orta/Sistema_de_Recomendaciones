@@ -10,7 +10,7 @@ inline std::vector<Producto> FiltrarPorPrecio (const std::vector<Producto>& prod
 	std::vector<Producto> resultado;
 	
 	for (const auto& prod : productos){
-        if (rangoPrecio == "Todo los precios"){
+        if (rangoPrecio == "Todos los precios"){
 			resultado.push_back(prod);
         } else if (rangoPrecio == "Menos de 900.0$" && prod.precio < 900.0){
 			resultado.push_back(prod);

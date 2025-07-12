@@ -3,6 +3,7 @@
 #include "lista_productos.h"
 #include "ventana_perfil.h"
 #include "recomendaciones.h"
+#include "Filtrar_Precios.h" // Incluir la función de filtrado por precio
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
@@ -12,6 +13,8 @@
 #include <QScrollArea>
 #include <QGridLayout>
 #include <QWidget>
+#include <limits> // Para std::numeric_limits
+#include <iomanip> // Para std::fixed y std::setprecision
 
 void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMostrados) {
     // Limpiar el layout anterior
@@ -43,7 +46,9 @@ void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMo
         layoutTarjeta->addWidget(nombre);
 
         // Precio
-        QLabel* precio = new QLabel(QString::fromStdString("$" + std::to_string(prod.precio)));
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2) << prod.precio;
+        QLabel* precio = new QLabel(QString::fromStdString("$" + ss.str()));
         layoutTarjeta->addWidget(precio);
 
         // Botones
@@ -88,13 +93,13 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     productos = obtenerListaProductos();
 
     // Layout principal vertical
-    auto *layoutPrincipal = new QVBoxLayout(this);
+    QVBoxLayout *layoutPrincipal = new QVBoxLayout(this);
 
     // Layout horizontal para las opciones
-    auto *layoutOpciones = new QHBoxLayout;
+    QHBoxLayout *layoutOpciones = new QHBoxLayout;
 
     // Combo de categorías
-    auto *comboCategorias = new QComboBox(this);
+    comboCategorias = new QComboBox(this);
     comboCategorias->addItem("Todas");
     comboCategorias->addItem("Recomendaciones");
     comboCategorias->addItem("Electrónica");
@@ -105,14 +110,23 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     layoutOpciones->addWidget(new QLabel("Categoría:", this));
     layoutOpciones->addWidget(comboCategorias);
 
-    
+    // Combo de precios
+    comboPrecios = new QComboBox(this);
+    comboPrecios->addItem("Todos los precios");
+    comboPrecios->addItem("Menos de 900.0$");
+    comboPrecios->addItem("900.0$ a 1300.0$");
+    comboPrecios->addItem("1300.0$ a 2500.0$");
+    comboPrecios->addItem("2500.0$ a 25000.0$");
+    comboPrecios->addItem("Más de 25000.0$");
+    layoutOpciones->addWidget(new QLabel("Precio:", this));
+    layoutOpciones->addWidget(comboPrecios);
 
     // Botón Información usuario
-    auto *botonInfoUsuario = new QPushButton("Información usuario", this);
+    QPushButton *botonInfoUsuario = new QPushButton("Información usuario", this);
     layoutOpciones->addWidget(botonInfoUsuario);
 
     // Botón Cerrar Sesión
-    auto *botonCerrarSesion = new QPushButton("Cerrar Sesión", this);
+    QPushButton *botonCerrarSesion = new QPushButton("Cerrar Sesión", this);
     layoutOpciones->addWidget(botonCerrarSesion);
 
     // Agregar layout de opciones al principal
@@ -130,34 +144,54 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
 
     actualizarRecomendaciones();
 
-    // Mostrar todos los productos al inicio
-    mostrarProductos(filtrarPorCategoria(productos, "Todas"));
+    // Conectar cambios de categoría y precio a la función de filtrado
+    connect(comboCategorias, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
+    connect(comboPrecios, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
 
-    // Conectar cambio de categoría
-    connect(comboCategorias, &QComboBox::currentTextChanged, this, [this](const QString &categoria) {
-        if (categoria == "Recomendaciones") {
-            std::vector<Producto> recomendados;
-            for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
-                for (const auto& prod : productos) {
-                    if (prod.id == nodo->valor) {
-                        recomendados.push_back(prod);
-                        break;
-                    }
-                }
-            }
-            mostrarProductos(recomendados);
-        } else {
-            mostrarProductos(filtrarPorCategoria(productos, categoria.toStdString()));
-        }
-    });
+    // Llamada inicial para mostrar productos
+    aplicarFiltrosYMostrarProductos();
 
     // Botón Información usuario
     connect(botonInfoUsuario, &QPushButton::clicked, this, [this]() {
-        VentanaPerfil ventanaPerfil(usuarioRegistrado, this);
+        VentanaPerfil ventanaPerfil(usuarioRegistrado, productos, this);
         ventanaPerfil.setMinimumSize(300, 200);
         ventanaPerfil.exec();
     });
 
     // Botón Cerrar Sesión
     connect(botonCerrarSesion, &QPushButton::clicked, this, &VentanaPrincipal::close);
+}
+
+void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
+    std::vector<Producto> productosFiltrados = productos; // Empezar con todos los productos
+
+    // 1. Filtrar por categoría
+    QString categoriaSeleccionada = comboCategorias->currentText();
+    if (categoriaSeleccionada == "Recomendaciones") {
+        std::vector<Producto> recomendados;
+        for (NodoString* nodo = usuarioRegistrado.productos_recomendados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
+            for (const auto& prod : productos) {
+                if (prod.id == nodo->valor) {
+                    recomendados.push_back(prod);
+                    break;
+                }
+            }
+        }
+        productosFiltrados = recomendados;
+    } else {
+        std::vector<Producto> tempFiltrados;
+        if (categoriaSeleccionada != "Todas") {
+            for (const auto& producto : productosFiltrados) {
+                if (producto.categoria == categoriaSeleccionada.toStdString()) {
+                    tempFiltrados.push_back(producto);
+                }
+            }
+            productosFiltrados = tempFiltrados;
+        }
+    }
+
+    // 2. Filtrar por precio usando la función FiltrarPorPrecio
+    productosFiltrados = FiltrarPorPrecio(productosFiltrados, comboPrecios->currentText().toStdString());
+
+    mostrarProductos(productosFiltrados);
 }

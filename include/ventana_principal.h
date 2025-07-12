@@ -2,6 +2,7 @@
 #define VENTANA_PRINCIPAL_H
 
 #include <QWidget>
+#include <QComboBox> // Added for QComboBox
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -15,9 +16,12 @@ public:
 private:
     void actualizarRecomendaciones();
     void mostrarProductos(const std::vector<Producto>& productosMostrados);
+    void aplicarFiltrosYMostrarProductos(); // Nueva función para aplicar todos los filtros
     perfil_usuario& usuarioRegistrado;
     std::vector<Producto> productos;
     QGridLayout* gridLayout;
+    QComboBox* comboPrecios; // Nuevo QComboBox para precios
+    QComboBox* comboCategorias; // Nuevo QComboBox para categorías
 };
 
 #endif // VENTANA_PRINCIPAL_H

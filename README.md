@@ -113,7 +113,7 @@ El proyecto incluye pruebas unitarias con Catch2:
 
 ## Créditos
 
-- Desarrollado por Abraham Orta.
+- Desarrollado por Abraham Orta, Isaac Maluenga.
 - Proyecto académico para la materia Técnicas De Programacion II.
 
 ## Licencia
