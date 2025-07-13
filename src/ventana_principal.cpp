@@ -33,7 +33,7 @@ void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMo
 
         // Imagen
         QLabel* imagen = new QLabel;
-        QPixmap pixmap(QString::fromStdString(":/" + prod.ruta_imagen));
+        QPixmap pixmap(QString::fromStdString(":/"+prod.ruta_imagen));
         if (pixmap.isNull()) {
             // Si no hay imagen, mostrar un placeholder
             pixmap.load(":/img/placeholder.jpg");

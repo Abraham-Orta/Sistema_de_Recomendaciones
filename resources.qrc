@@ -1,11 +1,105 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/B001.jpg</file>
-        <file>img/D001.jpg</file>
-        <file>img/E001.jpg</file>
-        <file>img/E002.jpg</file>
-        <file>img/H001.jpg</file>
-        <file>img/M001.jpg</file>
+        <file>img/cuidado personal y belleza/B001.jpg</file>
+        <file>img/cuidado personal y belleza/B002.jpg</file>
+        <file>img/cuidado personal y belleza/B003.jpg</file>
+        <file>img/cuidado personal y belleza/B004.jpeg</file>
+        <file>img/cuidado personal y belleza/B005.jpg</file>
+        <file>img/cuidado personal y belleza/B006.jpg</file>
+        <file>img/cuidado personal y belleza/B007.jpg</file>
+        <file>img/cuidado personal y belleza/B008.jpg</file>
+        <file>img/cuidado personal y belleza/B009.jpg</file>
+        <file>img/cuidado personal y belleza/B010.jpg</file>
+        <file>img/cuidado personal y belleza/B011.jpg</file>
+        <file>img/cuidado personal y belleza/B012.jpg</file>
+        <file>img/cuidado personal y belleza/B013.jpg</file>
+        <file>img/cuidado personal y belleza/B014.jpg</file>
+        <file>img/cuidado personal y belleza/B015.jpg</file>
+        <file>img/cuidado personal y belleza/B016.jpg</file>
+        <file>img/cuidado personal y belleza/B017.jpg</file>
+        <file>img/cuidado personal y belleza/B018.jpg</file>
+        <file>img/cuidado personal y belleza/B019.jpg</file>
+        <file>img/cuidado personal y belleza/B020.jpg</file>
+        <file>img/deportes y aire libre/D001.jpg</file>
+        <file>img/deportes y aire libre/D002.jpg</file>
+        <file>img/deportes y aire libre/D003.jpg</file>
+        <file>img/deportes y aire libre/D004.jpg</file>
+        <file>img/deportes y aire libre/D005.jpg</file>
+        <file>img/deportes y aire libre/D006.jpg</file>
+        <file>img/deportes y aire libre/D007.jpg</file>
+        <file>img/deportes y aire libre/D008.jpg</file>
+        <file>img/deportes y aire libre/D009.jpg</file>
+        <file>img/deportes y aire libre/D010.jpg</file>
+        <file>img/deportes y aire libre/D011.jpg</file>
+        <file>img/deportes y aire libre/D012.jpg</file>
+        <file>img/deportes y aire libre/D013.jpg</file>
+        <file>img/deportes y aire libre/D014.jpg</file>
+        <file>img/deportes y aire libre/D015.jpg</file>
+        <file>img/deportes y aire libre/D016.jpg</file>
+        <file>img/deportes y aire libre/D017.jpg</file>
+        <file>img/deportes y aire libre/D018.jpg</file>
+        <file>img/deportes y aire libre/D019.jpg</file>
+        <file>img/deportes y aire libre/D020.jpg</file>
+        <file>img/electronica/E001.jpg</file>
+        <file>img/electronica/E002.jpg</file>
+        <file>img/electronica/E003.jpg</file>
+        <file>img/electronica/E004.jpg</file>
+        <file>img/electronica/E005.jpg</file>
+        <file>img/electronica/E006.jpg</file>
+        <file>img/electronica/E007.jpg</file>
+        <file>img/electronica/E008.jpg</file>
+        <file>img/electronica/E009.jpg</file>
+        <file>img/electronica/E010.jpg</file>
+        <file>img/electronica/E011.jpg</file>
+        <file>img/electronica/E012.jpg</file>
+        <file>img/electronica/E013.jpg</file>
+        <file>img/electronica/E014.jpg</file>
+        <file>img/electronica/E015.jpg</file>
+        <file>img/electronica/E016.jpg</file>
+        <file>img/electronica/E017.jpg</file>
+        <file>img/electronica/E018.jpg</file>
+        <file>img/electronica/E019.jpg</file>
+        <file>img/electronica/E020.jpg</file>
+        <file>img/hogar y cocina/H001.jpg</file>
+        <file>img/hogar y cocina/H002.jpg</file>
+        <file>img/hogar y cocina/H003.jpg</file>
+        <file>img/hogar y cocina/H004.jpg</file>
+        <file>img/hogar y cocina/H005.jpg</file>
+        <file>img/hogar y cocina/H006.jpg</file>
+        <file>img/hogar y cocina/H007.jpg</file>
+        <file>img/hogar y cocina/H008.jpg</file>
+        <file>img/hogar y cocina/H009.jpg</file>
+        <file>img/hogar y cocina/H010.jpg</file>
+        <file>img/hogar y cocina/H011.jpg</file>
+        <file>img/hogar y cocina/H012.jpg</file>
+        <file>img/hogar y cocina/H013.jpg</file>
+        <file>img/hogar y cocina/H014.jpg</file>
+        <file>img/hogar y cocina/H015.jpg</file>
+        <file>img/hogar y cocina/H016.jpg</file>
+        <file>img/hogar y cocina/H017.jpg</file>
+        <file>img/hogar y cocina/H018.jpg</file>
+        <file>img/hogar y cocina/H019.jpg</file>
+        <file>img/hogar y cocina/H020.jpg</file>
+        <file>img/moda y accesorios/M001.jpg</file>
+        <file>img/moda y accesorios/M002.jpg</file>
+        <file>img/moda y accesorios/M003.jpg</file>
+        <file>img/moda y accesorios/M004.jpg</file>
+        <file>img/moda y accesorios/M005.jpg</file>
+        <file>img/moda y accesorios/M006.jpg</file>
+        <file>img/moda y accesorios/M007.jpg</file>
+        <file>img/moda y accesorios/M008.jpg</file>
+        <file>img/moda y accesorios/M009.jpg</file>
+        <file>img/moda y accesorios/M010.jpg</file>
+        <file>img/moda y accesorios/M011.jpg</file>
+        <file>img/moda y accesorios/M012.jpg</file>
+        <file>img/moda y accesorios/M013.jpg</file>
+        <file>img/moda y accesorios/M014.jpg</file>
+        <file>img/moda y accesorios/M015.jpg</file>
+        <file>img/moda y accesorios/M016.jpg</file>
+        <file>img/moda y accesorios/M017.jpg</file>
+        <file>img/moda y accesorios/M018.jpg</file>
+        <file>img/moda y accesorios/M019.jpg</file>
+        <file>img/moda y accesorios/M020.jpg</file>
         <file>img/placeholder.jpg</file>
         <file>styles.qss</file>
     </qresource>
