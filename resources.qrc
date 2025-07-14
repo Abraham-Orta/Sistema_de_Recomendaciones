@@ -102,5 +102,6 @@
         <file>img/moda y accesorios/M020.jpg</file>
         <file>img/placeholder.jpg</file>
         <file>styles.qss</file>
+        <file>styles_light.qss</file>
     </qresource>
 </RCC>

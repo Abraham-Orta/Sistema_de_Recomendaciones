@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QComboBox> // Added for QComboBox
+#include <QPushButton>
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -22,6 +23,10 @@ private:
     QGridLayout* gridLayout;
     QComboBox* comboPrecios; // Nuevo QComboBox para precios
     QComboBox* comboCategorias; // Nuevo QComboBox para categorías
+    QPushButton* botonTema; // Nuevo QPushButton para cambiar el tema
+
+private slots:
+    void toggleTema(); // Nueva función para cambiar el tema
 };
 
 #endif // VENTANA_PRINCIPAL_H

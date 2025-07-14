@@ -3,7 +3,7 @@
 #include "lista_productos.h"
 #include "ventana_perfil.h"
 #include "recomendaciones.h"
-#include "Filtrar_Precios.h" // Incluir la función de filtrado por precio
+#include "Filtrar_Precios.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
@@ -13,8 +13,10 @@
 #include <QScrollArea>
 #include <QGridLayout>
 #include <QWidget>
-#include <limits> // Para std::numeric_limits
-#include <iomanip> // Para std::fixed y std::setprecision
+#include <limits>
+#include <iomanip>
+#include <QFile>
+#include <QApplication>
 
 void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMostrados) {
     // Limpiar el layout anterior
@@ -129,6 +131,10 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     QPushButton *botonCerrarSesion = new QPushButton("Cerrar Sesión", this);
     layoutOpciones->addWidget(botonCerrarSesion);
 
+    // Botón Tema
+    botonTema = new QPushButton("Cambiar Tema", this);
+    layoutOpciones->addWidget(botonTema);
+
     // Agregar layout de opciones al principal
     layoutPrincipal->addLayout(layoutOpciones);
 
@@ -151,15 +157,18 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     // Llamada inicial para mostrar productos
     aplicarFiltrosYMostrarProductos();
 
-    // Botón Información usuario
+    // Conectar botón Información usuario
     connect(botonInfoUsuario, &QPushButton::clicked, this, [this]() {
         VentanaPerfil ventanaPerfil(usuarioRegistrado, productos, this);
         ventanaPerfil.setMinimumSize(300, 200);
         ventanaPerfil.exec();
     });
 
-    // Botón Cerrar Sesión
+    // Conectar botón Cerrar Sesión
     connect(botonCerrarSesion, &QPushButton::clicked, this, &VentanaPrincipal::close);
+
+    // Conectar botón Tema
+    connect(botonTema, &QPushButton::clicked, this, &VentanaPrincipal::toggleTema);
 }
 
 void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
@@ -194,4 +203,23 @@ void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
     productosFiltrados = FiltrarPorPrecio(productosFiltrados, comboPrecios->currentText().toStdString());
 
     mostrarProductos(productosFiltrados);
+}
+
+void VentanaPrincipal::toggleTema() {
+    static bool isDarkTheme = true; // Empezar con el tema oscuro (styles.qss)
+    QFile file;
+    if (isDarkTheme) {
+        file.setFileName(":/styles_light.qss");
+    } else {
+        file.setFileName(":/styles.qss");
+    }
+
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        QString styleSheet = QLatin1String(file.readAll());
+        qApp->setStyleSheet(styleSheet);
+        file.close();
+        isDarkTheme = !isDarkTheme;
+    } else {
+        QMessageBox::warning(this, "Error", "No se pudo cargar la hoja de estilo.");
+    }
 }
