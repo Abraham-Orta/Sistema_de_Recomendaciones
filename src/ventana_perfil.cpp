@@ -1,83 +1,78 @@
 #include "ventana_perfil.h"
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QListWidget>
-#include <iomanip> // Para std::fixed y std::setprecision
-#include <sstream> // Para std::stringstream
-#include <QFormLayout> // Nuevo include para QFormLayout
-#include <QGroupBox>   // Nuevo include para QGroupBox
+#include <QTableWidget>
+#include <QHeaderView>
+#include <iomanip>
+#include <sstream>
+#include <QFormLayout>
+#include <QGroupBox>
 
 VentanaPerfil::VentanaPerfil(const perfil_usuario& perfil, const std::vector<Producto>& todosLosProductos, QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle("Perfil de Usuario");
-    resize(450, 800); // Mantener el tamaño por ahora, se puede ajustar si es necesario
-    QVBoxLayout *mainLayout = new QVBoxLayout(this); // Layout principal
+    resize(600, 800); 
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    // Sección de Detalles del Usuario
     QGroupBox *userDetailsGroup = new QGroupBox("Detalles del Usuario", this);
     QFormLayout *formLayout = new QFormLayout(userDetailsGroup);
-
-    QLabel *nombreLabel = new QLabel("<b>Nombre:</b>", this);
-    formLayout->addRow(nombreLabel, new QLabel(QString::fromStdString(perfil.nombre), this));
-
-    QLabel *apellidoLabel = new QLabel("<b>Apellido:</b>", this);
-    formLayout->addRow(apellidoLabel, new QLabel(QString::fromStdString(perfil.apellido), this));
-
-    QLabel *idLabel = new QLabel("<b>ID:</b>", this);
-    formLayout->addRow(idLabel, new QLabel(QString::fromStdString(perfil.id), this));
-
-    QLabel *usuarioLabel = new QLabel("<b>Usuario:</b>", this);
-    formLayout->addRow(usuarioLabel, new QLabel(QString::fromStdString(perfil.usuario), this));
-
-    QLabel *contrasenaLabel = new QLabel("<b>Contraseña:</b>", this);
-    formLayout->addRow(contrasenaLabel, new QLabel(QString::fromStdString(perfil.contraseña), this));
-
+    formLayout->addRow("<b>Nombre:</b>", new QLabel(QString::fromStdString(perfil.nombre), this));
+    formLayout->addRow("<b>Apellido:</b>", new QLabel(QString::fromStdString(perfil.apellido), this));
+    formLayout->addRow("<b>ID:</b>", new QLabel(QString::fromStdString(perfil.id), this));
+    formLayout->addRow("<b>Usuario:</b>", new QLabel(QString::fromStdString(perfil.usuario), this));
+    formLayout->addRow("<b>Contraseña:</b>", new QLabel(QString::fromStdString(perfil.contraseña), this));
     mainLayout->addWidget(userDetailsGroup);
 
-    // Sección de Productos Comprados
     QGroupBox *compradosGroup = new QGroupBox("Productos Comprados", this);
     QVBoxLayout *compradosLayout = new QVBoxLayout(compradosGroup);
-    listaComprados = new QListWidget(this);
-    if (perfil.productos_comprados.cabeza == nullptr) {
-        listaComprados->addItem("Ningún producto comprado.");
-    } else {
-        for (NodoString* nodo = perfil.productos_comprados.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
-            // Buscar el producto por ID en todosLosProductos
-            for (const auto& prod : todosLosProductos) {
-                if (prod.id == nodo->valor) {
-                    std::stringstream ss;
-                    ss << std::fixed << std::setprecision(2) << prod.precio;
-                    listaComprados->addItem(QString::fromStdString(prod.nombre + " (" + prod.categoria + ") - $" + ss.str()));
-                    break;
-                }
-            }
-        }
-    }
-    compradosLayout->addWidget(listaComprados);
+    tablaComprados = new QTableWidget(this);
+    tablaComprados->setColumnCount(4);
+    tablaComprados->setHorizontalHeaderLabels({"ID", "Nombre", "Categoría", "Precio"});
+    llenarTabla(tablaComprados, perfil.productos_comprados, todosLosProductos);
+    compradosLayout->addWidget(tablaComprados);
     mainLayout->addWidget(compradosGroup);
 
-    // Sección de Productos Favoritos
     QGroupBox *favoritosGroup = new QGroupBox("Productos Favoritos", this);
     QVBoxLayout *favoritosLayout = new QVBoxLayout(favoritosGroup);
-    listaFavoritos = new QListWidget(this);
-    if (perfil.productos_favoritos.cabeza == nullptr) {
-        listaFavoritos->addItem("Ningún producto favorito.");
-    } else {
-        for (NodoString* nodo = perfil.productos_favoritos.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
-            // Buscar el producto por ID en todosLosProductos
-            for (const auto& prod : todosLosProductos) {
-                if (prod.id == nodo->valor) {
-                    std::stringstream ss;
-                    ss << std::fixed << std::setprecision(2) << prod.precio;
-                    listaFavoritos->addItem(QString::fromStdString(prod.nombre + " (" + prod.categoria + ") - $" + ss.str()));
-                    break;
-                }
-            }
-        }
-    }
-    favoritosLayout->addWidget(listaFavoritos);
+    tablaFavoritos = new QTableWidget(this);
+    tablaFavoritos->setColumnCount(4);
+    tablaFavoritos->setHorizontalHeaderLabels({"ID", "Nombre", "Categoría", "Precio"});
+    llenarTabla(tablaFavoritos, perfil.productos_favoritos, todosLosProductos);
+    favoritosLayout->addWidget(tablaFavoritos);
     mainLayout->addWidget(favoritosGroup);
 
     setLayout(mainLayout);
+}
+
+void VentanaPerfil::llenarTabla(QTableWidget* tabla, const ListaEnlazadaString& idsProductos, const std::vector<Producto>& todosLosProductos) {
+    tabla->setRowCount(0);
+    if (idsProductos.cabeza == nullptr) {
+        tabla->setRowCount(1);
+        QTableWidgetItem* item = new QTableWidgetItem("No hay productos en esta lista.");
+        item->setTextAlignment(Qt::AlignCenter);
+        tabla->setItem(0, 0, item);
+        tabla->setSpan(0, 0, 1, 4);
+        return;
+    }
+
+    int row = 0;
+    for (NodoString* nodo = idsProductos.cabeza; nodo != nullptr; nodo = nodo->siguiente) {
+        for (const auto& prod : todosLosProductos) {
+            if (prod.id == nodo->valor) {
+                tabla->insertRow(row);
+                tabla->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(prod.id)));
+                tabla->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(prod.nombre)));
+                tabla->setItem(row, 2, new QTableWidgetItem(QString::fromStdString(prod.categoria)));
+                std::stringstream ss;
+                ss << std::fixed << std::setprecision(2) << prod.precio;
+                QTableWidgetItem* precioItem = new QTableWidgetItem(QString::fromStdString(ss.str()));
+                precioItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                tabla->setItem(row, 3, precioItem);
+                row++;
+                break;
+            }
+        }
+    }
+    tabla->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
