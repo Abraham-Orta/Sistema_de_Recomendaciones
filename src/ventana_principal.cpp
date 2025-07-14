@@ -89,7 +89,7 @@ void VentanaPrincipal::actualizarRecomendaciones() {
 VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     : QWidget(parent), usuarioRegistrado(usuario)
 {
-    setWindowTitle("Tienda en Línea");
+    setWindowTitle("Tienda Guayana");
     resize(700, 500);
 
     productos = obtenerListaProductos();
