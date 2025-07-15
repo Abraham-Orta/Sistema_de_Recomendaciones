@@ -31,7 +31,6 @@ private:
     QTimer* debounceTimer;
     std::map<std::string, QWidget*> displayedProductWidgets;
 
-#include "filtrar_descripcion.h"
 
 private slots:
     void toggleTema(); // Nueva función para cambiar el tema

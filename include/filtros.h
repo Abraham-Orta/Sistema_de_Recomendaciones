@@ -4,16 +4,14 @@
 
 #include <vector>
 #include <string>
+#include <algorithm> //Para implementar transform
+#include <cctype> // Para implementar tolower() y así poder captar tanto caracteres en mayúsculas como minúsculas
 #include "producto.h"
 
-inline std::vector<Producto> filtrarPorCategoria(const std::vector<Producto>& productos, const std::string& categoria) {
-    std::vector<Producto> resultado;
-    for (const auto& prod : productos) {
-        if (categoria == "Todas" || prod.categoria == categoria) {
-            resultado.push_back(prod);
-        }
-    }
-    return resultado;
-}
+std::vector<Producto> filtrarPorCategoria(const std::vector<Producto>& productos, const std::string& categoria);
+
+std::vector<Producto> FiltrarPorPrecio (const std::vector<Producto>& productos, const std::string& rangoPrecio);
+
+std::vector<Producto> filtrarDescripcion (const std::vector<Producto>& productos, const std::string& filtroDescrip);
 
 #endif // FILTROS_H

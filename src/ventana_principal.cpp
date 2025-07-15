@@ -1,10 +1,8 @@
 #include "ventana_principal.h"
-#include "filtrar_descripcion.h"
 #include "filtros.h"
 #include "lista_productos.h"
 #include "ventana_perfil.h"
 #include "recomendaciones.h"
-#include "Filtrar_Precios.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>

@@ -27,6 +27,9 @@ set(SRC_FILES
     src/ventana_inicial.cpp
     src/dialogo_registro_nuevo.cpp
     src/preferencias_dialogo.cpp
+    src/recomendaciones.cpp
+    src/filtros.cpp
+    src/nodo_string.cpp
 )
 
 # Ejecutable principal
@@ -34,7 +37,7 @@ add_executable(sistema_de_recomendaciones ${SRC_FILES} ${HEADERS} resources.qrc)
 target_link_libraries(sistema_de_recomendaciones Qt6::Widgets)
 
 # Ejecutable para pruebas unitarias
-add_executable(test_filtros src/test_filtros.cpp)
+add_executable(test_filtros src/test_filtros.cpp src/filtros.cpp)
 target_include_directories(test_filtros PRIVATE include)
 # Si tus pruebas usan Qt, descomenta la siguiente línea:
 # target_link_libraries(test_filtros Qt6::Widgets)
