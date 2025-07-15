@@ -1,4 +1,5 @@
 #include "ventana_principal.h"
+#include "filtrar_descripcion.h"
 #include "filtros.h"
 #include "lista_productos.h"
 #include "ventana_perfil.h"
@@ -133,6 +134,15 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     layoutOpciones->addWidget(new QLabel("Precio:", this));
     layoutOpciones->addWidget(comboPrecios);
 
+    //Casilla de descripción
+    QLabel *labelDescripcion = new QLabel("Buscar: ", this);
+    layoutOpciones->addWidget(labelDescripcion);
+
+    lineEditDescripcion = new QLineEdit (this);
+    lineEditDescripcion->setPlaceholderText("Buscar descripción...");
+    lineEditDescripcion->setMinimumWidth(150);
+    layoutOpciones->addWidget(lineEditDescripcion);
+
     // Botón Información usuario
     QPushButton *botonInfoUsuario = new QPushButton("Información usuario", this);
     layoutOpciones->addWidget(botonInfoUsuario);
@@ -165,6 +175,7 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     // Conectar cambios de categoría y precio a la función de filtrado
     connect(comboCategorias, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
     connect(comboPrecios, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
+    connect(lineEditDescripcion, &QLineEdit::textChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
 
     // Llamada inicial para mostrar productos
     aplicarFiltrosYMostrarProductos();
@@ -213,6 +224,11 @@ void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
 
     // 2. Filtrar por precio usando la función FiltrarPorPrecio
     productosFiltrados = FiltrarPorPrecio(productosFiltrados, comboPrecios->currentText().toStdString());
+
+    // 3. Filtrar por descripción
+    if (!lineEditDescripcion->text().isEmpty()){
+        productosFiltrados = filtrarDescripcion (productosFiltrados, lineEditDescripcion->text().toStdString());
+    }
 
     mostrarProductos(productosFiltrados);
 }

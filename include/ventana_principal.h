@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QComboBox> // Added for QComboBox
 #include <QPushButton>
+#include <QLineEdit>
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -24,6 +25,9 @@ private:
     QComboBox* comboPrecios; // Nuevo QComboBox para precios
     QComboBox* comboCategorias; // Nuevo QComboBox para categorías
     QPushButton* botonTema; // Nuevo QPushButton para cambiar el tema
+    QLineEdit* lineEditDescripcion; // Nuevo QLineEdit para la descripción
+
+#include "filtrar_descripcion.h"
 
 private slots:
     void toggleTema(); // Nueva función para cambiar el tema
