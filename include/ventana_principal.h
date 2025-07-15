@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTimer>
+#include <map>
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -28,6 +29,7 @@ private:
     QPushButton* botonTema; // Nuevo QPushButton para cambiar el tema
     QLineEdit* lineEditDescripcion; // Nuevo QLineEdit para la descripción
     QTimer* debounceTimer;
+    std::map<std::string, QWidget*> displayedProductWidgets;
 
 #include "filtrar_descripcion.h"
 

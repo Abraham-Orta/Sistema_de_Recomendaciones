@@ -20,64 +20,74 @@
 #include <QApplication>
 
 void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMostrados) {
-    // Limpiar el layout anterior
-    QLayoutItem* item;
-    while ((item = gridLayout->takeAt(0)) != nullptr) {
-        delete item->widget();
-        delete item;
-    }
-
+    std::map<std::string, QWidget*> newDisplayedProductWidgets;
     int fila = 0;
     int col = 0;
+
+    // Paso 1: Procesar los productos que deben mostrarse
     for (const auto& prod : productosMostrados) {
-        // Crear la tarjeta del producto
-        QWidget* tarjeta = new QWidget;
-        tarjeta->setFixedWidth(230); // Establecer ancho fijo para la tarjeta del producto
-        QVBoxLayout* layoutTarjeta = new QVBoxLayout(tarjeta);
-        layoutTarjeta->setAlignment(Qt::AlignCenter); // Centrar el contenido de la tarjeta
+        QWidget* tarjeta = nullptr;
 
-        // Imagen
-        QLabel* imagen = new QLabel;
-        imagen->setFixedSize(220, 220); // Establecer tamaño fijo para el QLabel de la imagen
-        imagen->setAlignment(Qt::AlignCenter); // Centrar la imagen dentro del QLabel
-        QPixmap pixmap(QString::fromStdString(":/"+prod.ruta_imagen));
-        if (pixmap.isNull()) {
-            // Si no hay imagen, mostrar un placeholder
-            pixmap.load(":/img/placeholder.jpg");
+        // Intentar reutilizar un widget existente
+        auto it = displayedProductWidgets.find(prod.id);
+        if (it != displayedProductWidgets.end()) {
+            tarjeta = it->second;
+            // Mover el widget al nuevo mapa temporal
+            newDisplayedProductWidgets[prod.id] = tarjeta;
+            // Eliminarlo del mapa viejo para saber cuáles eliminar después
+            displayedProductWidgets.erase(it);
+        } else {
+            // Crear una nueva tarjeta si no existe
+            tarjeta = new QWidget;
+            tarjeta->setFixedWidth(230);
+            QVBoxLayout* layoutTarjeta = new QVBoxLayout(tarjeta);
+            layoutTarjeta->setAlignment(Qt::AlignCenter);
+
+            // Imagen
+            QLabel* imagen = new QLabel;
+            imagen->setFixedSize(220, 220);
+            imagen->setAlignment(Qt::AlignCenter);
+            QPixmap pixmap(QString::fromStdString(":/"+prod.ruta_imagen));
+            if (pixmap.isNull()) {
+                pixmap.load(":/img/placeholder.jpg");
+            }
+            imagen->setPixmap(pixmap.scaled(220, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            layoutTarjeta->addWidget(imagen);
+
+            // Nombre
+            QLabel* nombre = new QLabel(QString::fromStdString(prod.nombre));
+            layoutTarjeta->addWidget(nombre);
+
+            // Precio
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << prod.precio;
+            QLabel* precio = new QLabel(QString::fromStdString("$" + ss.str()));
+            layoutTarjeta->addWidget(precio);
+
+            // Botones
+            QHBoxLayout* layoutBotones = new QHBoxLayout;
+            QPushButton* botonComprar = new QPushButton("Comprar");
+            QPushButton* botonMeGusta = new QPushButton("Me gusta");
+            layoutBotones->addWidget(botonComprar);
+            layoutBotones->addWidget(botonMeGusta);
+            layoutTarjeta->addLayout(layoutBotones);
+
+            // Conectar botones
+            connect(botonComprar, &QPushButton::clicked, this, [this, prod]() {
+                usuarioRegistrado.productos_comprados.agregar(prod.id);
+                actualizarRecomendaciones();
+                QMessageBox::information(this, "Compra", "¡Producto comprado!");
+            });
+            connect(botonMeGusta, &QPushButton::clicked, this, [this, prod]() {
+                usuarioRegistrado.productos_favoritos.agregar(prod.id);
+                actualizarRecomendaciones();
+                QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
+            });
+
+            newDisplayedProductWidgets[prod.id] = tarjeta;
         }
-        imagen->setPixmap(pixmap.scaled(220, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Usar SmoothTransformation para mejor calidad
-        layoutTarjeta->addWidget(imagen);
 
-        // Nombre
-        QLabel* nombre = new QLabel(QString::fromStdString(prod.nombre));
-        layoutTarjeta->addWidget(nombre);
-
-        // Precio
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << prod.precio;
-        QLabel* precio = new QLabel(QString::fromStdString("$" + ss.str()));
-        layoutTarjeta->addWidget(precio);
-
-        // Botones
-        QHBoxLayout* layoutBotones = new QHBoxLayout;
-        QPushButton* botonComprar = new QPushButton("Comprar");
-        QPushButton* botonMeGusta = new QPushButton("Me gusta");
-        layoutBotones->addWidget(botonComprar);
-        layoutBotones->addWidget(botonMeGusta);
-        layoutTarjeta->addLayout(layoutBotones);
-
-        // Conectar botones
-        connect(botonComprar, &QPushButton::clicked, this, [this, prod]() {
-            usuarioRegistrado.productos_comprados.agregar(prod.id);
-            actualizarRecomendaciones();
-            QMessageBox::information(this, "Compra", "¡Producto comprado!");
-        });
-        connect(botonMeGusta, &QPushButton::clicked, this, [this, prod]() {
-            usuarioRegistrado.productos_favoritos.agregar(prod.id);
-            actualizarRecomendaciones();
-            QMessageBox::information(this, "Me gusta", "¡Producto agregado a favoritos!");
-        });
-
+        // Añadir o mover el widget al gridLayout
         gridLayout->addWidget(tarjeta, fila, col);
         col++;
         if (col == 4) {
@@ -86,7 +96,26 @@ void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMo
         }
     }
 
-    // Añadir espaciadores para evitar que los productos se estiren
+    // Paso 2: Eliminar los widgets que ya no deben mostrarse
+    for (auto const& [id, widget] : displayedProductWidgets) {
+        gridLayout->removeWidget(widget);
+        delete widget;
+    }
+
+    // Paso 3: Actualizar el mapa de widgets mostrados
+    displayedProductWidgets = std::move(newDisplayedProductWidgets);
+
+    // Paso 4: Reorganizar los espaciadores
+    // Limpiar todos los espaciadores existentes
+    for (int i = gridLayout->count() - 1; i >= 0; --i) {
+        QLayoutItem* item = gridLayout->itemAt(i);
+        if (item && item->spacerItem()) {
+            gridLayout->removeItem(item);
+            delete item;
+        }
+    }
+
+    // Añadir nuevos espaciadores
     if (col > 0) { // Si la última fila no está completa
         gridLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), fila, col, 1, 4 - col);
     }
