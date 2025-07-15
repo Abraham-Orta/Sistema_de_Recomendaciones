@@ -42,17 +42,26 @@ std::vector<Producto> filtrarDescripcion (const std::vector<Producto>& productos
     std::string filtroLower = filtroDescrip;
     std::transform(filtroLower.begin(), filtroLower.end(), filtroLower.begin(), [](unsigned char c){return std::tolower(c);} );
 
+    //Filtros de los productos en la casilla "Buscar"
     for (const auto& prod : productos){
-        //nombre y descripcion a caracteres en minúsculas
+
+        //Nombre
         std::string nombreLower = prod.nombre;
         std::transform (nombreLower.begin(), nombreLower.end(), nombreLower.begin(),
                        [](unsigned char c){return std::tolower(c);});
 
+        //Desceipción
         std::string descripcionLower = prod.descripcion;
         std::transform (descripcionLower.begin(), descripcionLower.end(), descripcionLower.begin(),
                        [](unsigned char c){return std::tolower(c);});
 
-        if (nombreLower.find(filtroLower) != std::string::npos || descripcionLower.find(filtroLower) != std::string::npos){ //npos equivalente a size_t
+        //Marca
+        std::string marcaLower = prod.marca;
+        std::transform (marcaLower.begin(), marcaLower.end(), marcaLower.begin(),
+                       [](unsigned char c){return std::tolower(c);});
+
+        if (nombreLower.find(filtroLower) != std::string::npos || descripcionLower.find(filtroLower) != std::string::npos
+            || marcaLower.find(filtroLower) != std::string::npos){ //npos equivalente a size_t
             resultado.push_back(prod);
         }
     }
