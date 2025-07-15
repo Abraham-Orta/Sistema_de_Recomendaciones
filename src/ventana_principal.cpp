@@ -172,10 +172,17 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
 
     actualizarRecomendaciones();
 
+    // Inicializar y conectar el debounceTimer
+    debounceTimer = new QTimer(this);
+    debounceTimer->setSingleShot(true); // Asegura que el timer se dispare solo una vez
+    debounceTimer->setInterval(300); // 300 ms de retraso
+    connect(debounceTimer, &QTimer::timeout, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
+
     // Conectar cambios de categoría y precio a la función de filtrado
     connect(comboCategorias, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
     connect(comboPrecios, &QComboBox::currentTextChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
-    connect(lineEditDescripcion, &QLineEdit::textChanged, this, &VentanaPrincipal::aplicarFiltrosYMostrarProductos);
+    // Conectar el QLineEdit al debounceTimer
+    connect(lineEditDescripcion, &QLineEdit::textChanged, debounceTimer, QOverload<>::of(&QTimer::start));
 
     // Llamada inicial para mostrar productos
     aplicarFiltrosYMostrarProductos();

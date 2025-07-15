@@ -5,6 +5,7 @@
 #include <QComboBox> // Added for QComboBox
 #include <QPushButton>
 #include <QLineEdit>
+#include <QTimer>
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -26,6 +27,7 @@ private:
     QComboBox* comboCategorias; // Nuevo QComboBox para categorías
     QPushButton* botonTema; // Nuevo QPushButton para cambiar el tema
     QLineEdit* lineEditDescripcion; // Nuevo QLineEdit para la descripción
+    QTimer* debounceTimer;
 
 #include "filtrar_descripcion.h"
 
