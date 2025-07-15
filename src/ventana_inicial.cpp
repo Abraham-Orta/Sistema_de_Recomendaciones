@@ -67,7 +67,7 @@ void VentanaInicial::abrirDialogoRegistro() {
 }
 
 void VentanaInicial::toggleTema() {
-    static bool isDarkTheme = true; // Empezar con el tema oscuro (styles.qss)
+    static bool isDarkTheme = false; // Empezar con el tema claro (styles_light.qss)
     QFile file;
     if (isDarkTheme) {
         file.setFileName(":/styles_light.qss");

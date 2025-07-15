@@ -31,16 +31,20 @@ void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMo
     for (const auto& prod : productosMostrados) {
         // Crear la tarjeta del producto
         QWidget* tarjeta = new QWidget;
+        tarjeta->setFixedWidth(230); // Establecer ancho fijo para la tarjeta del producto
         QVBoxLayout* layoutTarjeta = new QVBoxLayout(tarjeta);
+        layoutTarjeta->setAlignment(Qt::AlignCenter); // Centrar el contenido de la tarjeta
 
         // Imagen
         QLabel* imagen = new QLabel;
+        imagen->setFixedSize(220, 220); // Establecer tamaño fijo para el QLabel de la imagen
+        imagen->setAlignment(Qt::AlignCenter); // Centrar la imagen dentro del QLabel
         QPixmap pixmap(QString::fromStdString(":/"+prod.ruta_imagen));
         if (pixmap.isNull()) {
             // Si no hay imagen, mostrar un placeholder
             pixmap.load(":/img/placeholder.jpg");
         }
-        imagen->setPixmap(pixmap.scaled(150, 150, Qt::KeepAspectRatio));
+        imagen->setPixmap(pixmap.scaled(220, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Usar SmoothTransformation para mejor calidad
         layoutTarjeta->addWidget(imagen);
 
         // Nombre
@@ -80,6 +84,12 @@ void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMo
             fila++;
         }
     }
+
+    // Añadir espaciadores para evitar que los productos se estiren
+    if (col > 0) { // Si la última fila no está completa
+        gridLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum), fila, col, 1, 4 - col);
+    }
+    gridLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), fila + 1, 0, 1, 4);
 }
 
 void VentanaPrincipal::actualizarRecomendaciones() {
@@ -90,7 +100,7 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     : QWidget(parent), usuarioRegistrado(usuario)
 {
     setWindowTitle("Tienda Guayana");
-    resize(700, 500);
+    resize(950, 650);
 
     productos = obtenerListaProductos();
 
@@ -141,8 +151,10 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     // ScrollArea para los productos
     QScrollArea* scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
+    scrollArea->setMinimumSize(920, 460); // Establecer tamaño mínimo para el QScrollArea
     QWidget* widgetContenedor = new QWidget;
     gridLayout = new QGridLayout(widgetContenedor);
+    gridLayout->setAlignment(Qt::AlignCenter); // Centrar el contenido del grid
     scrollArea->setWidget(widgetContenedor);
     layoutPrincipal->addWidget(scrollArea);
 
@@ -206,7 +218,7 @@ void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
 }
 
 void VentanaPrincipal::toggleTema() {
-    static bool isDarkTheme = true; // Empezar con el tema oscuro (styles.qss)
+    static bool isDarkTheme = false; // Empezar con el tema claro (styles_light.qss)
     QFile file;
     if (isDarkTheme) {
         file.setFileName(":/styles_light.qss");

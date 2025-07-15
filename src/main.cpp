@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // Cargar y aplicar la hoja de estilos
-    QFile styleSheetFile(":/styles.qss");
+    QFile styleSheetFile(":/styles_light.qss");
     if (styleSheetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QString styleSheet = QLatin1String(styleSheetFile.readAll());
         app.setStyleSheet(styleSheet);
