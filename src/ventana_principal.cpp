@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <QFile>
 #include <QApplication>
+#include <QFont>
 
 void VentanaPrincipal::mostrarProductos(const std::vector<Producto>& productosMostrados) {
     std::map<std::string, QWidget*> newDisplayedProductWidgets;
@@ -186,7 +187,7 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     layoutPrincipal->addLayout(layoutOpciones);
 
     // ScrollArea para los productos
-    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setMinimumSize(920, 460); // Establecer tamaño mínimo para el QScrollArea
     QWidget* widgetContenedor = new QWidget;
@@ -194,6 +195,15 @@ VentanaPrincipal::VentanaPrincipal(perfil_usuario& usuario, QWidget *parent)
     gridLayout->setAlignment(Qt::AlignCenter); // Centrar el contenido del grid
     scrollArea->setWidget(widgetContenedor);
     layoutPrincipal->addWidget(scrollArea);
+
+    // Etiqueta para cuando no hay productos
+    noProductsLabel = new QLabel("No se encontraron productos", this);
+    noProductsLabel->setAlignment(Qt::AlignCenter);
+    QFont font = noProductsLabel->font();
+    font.setPointSize(font.pointSize() * 2);
+    noProductsLabel->setFont(font);
+    layoutPrincipal->addWidget(noProductsLabel);
+    noProductsLabel->hide();
 
     setLayout(layoutPrincipal);
 
@@ -262,6 +272,14 @@ void VentanaPrincipal::aplicarFiltrosYMostrarProductos() {
     // 3. Filtrar por descripción
     if (!lineEditDescripcion->text().isEmpty()){
         productosFiltrados = filtrarDescripcion (productosFiltrados, lineEditDescripcion->text().toStdString());
+    }
+
+    if (productosFiltrados.empty()) {
+        scrollArea->hide();
+        noProductsLabel->show();
+    } else {
+        scrollArea->show();
+        noProductsLabel->hide();
     }
 
     mostrarProductos(productosFiltrados);

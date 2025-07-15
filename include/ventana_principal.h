@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QTimer>
 #include <map>
+#include <QLabel>
+#include <QScrollArea>
 #include "perfil_usuario.h"
 #include "producto.h"
 #include <vector>
@@ -30,6 +32,8 @@ private:
     QLineEdit* lineEditDescripcion; // Nuevo QLineEdit para la descripción
     QTimer* debounceTimer;
     std::map<std::string, QWidget*> displayedProductWidgets;
+    QLabel* noProductsLabel; // Etiqueta para mostrar cuando no hay productos
+    QScrollArea* scrollArea; // ScrollArea para los productos
 
 
 private slots:
