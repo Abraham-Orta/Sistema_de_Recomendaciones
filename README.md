@@ -217,47 +217,69 @@ Gestiona los perfiles de usuario utilizando un árbol binario de búsqueda para 
 - **`class ArbolUsuarios`**: El árbol de búsqueda binario.
     - `insertar(const perfil_usuario& perfil)`: Añade un nuevo usuario al árbol.
     - `buscar(const std::string& nombreUsuario)`: Busca un usuario por su nombre de usuario.
-    - `~ArbolUsuarios()`: Libera la memoria del árbol.
+    - `destruir(NodoUsuario* nodo)`: Función auxiliar recursiva para liberar la memoria del árbol.
+    - `~ArbolUsuarios()`: Destructor, libera la memoria del árbol.
 
 ### `filtros.h` / `filtros.cpp`
-Contiene la lógica para filtrar productos.
-- `filtrarPorCategoria(...)`: Devuelve un vector de productos que pertenecen a una categoría específica.
+Contiene la lógica para filtrar productos por diversas características.
+- `filtrarPorCategoria(const std::vector<Producto>& productos, const std::string& categoria)`: Devuelve un vector de productos que pertenecen a una categoría específica.
+- `FiltrarPorPrecio(const std::vector<Producto>& productos, const std::string& rangoPrecio)`: Filtra productos basándose en rangos de precios predefinidos.
+- `filtrarDescripcion(const std::vector<Producto>& productos, const std::string& filtroDescrip)`: Filtra productos buscando una cadena en su nombre, descripción o marca (búsqueda insensible a mayúsculas/minúsculas).
 
 ### `recomendaciones.h` / `recomendaciones.cpp`
 Implementa el motor de recomendaciones.
-- `recomendarProductos(...)`: Genera una lista de productos recomendados para un usuario basándose en su historial de compras, "me gusta" y preferencias.
+- `bool estaEnLista(const ListaEnlazadaString& lista, const std::string& id)`: Función auxiliar que verifica si un ID de producto está presente en una `ListaEnlazadaString`.
+- `recomendarProductos(ListaEnlazadaString& recomendados, const std::vector<Producto>& todos, const ListaEnlazadaString& comprados, const ListaEnlazadaString& favoritos, const PreferenciasProducto& preferencias, size_t maxRecomendaciones)`: Genera una lista de productos recomendados para un usuario basándose en su historial de compras, "me gusta" y preferencias.
 
 ### `nodo_string.h` / `nodo_string.cpp`
 Implementa una lista enlazada simple para almacenar cadenas de texto.
 - **`struct NodoString`**: Nodo de la lista, contiene un `std::string` y un puntero al siguiente nodo.
 - **`class ListaEnlazadaString`**: La estructura de la lista enlazada.
-    - `agregar(const std::string& v)`: Añade un elemento a la lista.
-    - `contiene(const std::string& valor) const`: Verifica si un valor ya existe en la lista.
+    - `ListaEnlazadaString()`: Constructor por defecto.
+    - `ListaEnlazadaString(const ListaEnlazadaString& other)`: Constructor de copia.
+    - `ListaEnlazadaString& operator=(const ListaEnlazadaString& other)`: Operador de asignación de copia.
+    - `~ListaEnlazadaString()`: Destructor, libera la memoria de la lista.
+    - `agregar(const std::string& v)`: Añade un elemento al final de la lista.
     - `limpiar()`: Elimina todos los nodos de la lista.
+    - `contiene(const std::string& valor) const`: Verifica si un valor ya existe en la lista.
 
 ### Clases de la Interfaz Gráfica (UI)
 
 - **`VentanaInicial` (`ventana_inicial.h/.cpp`)**: Es la primera ventana que ve el usuario. Ofrece las opciones de iniciar sesión o registrarse.
-    - `on_loginButton_clicked()`: Abre el diálogo de inicio de sesión.
-    - `on_registerButton_clicked()`: Abre el diálogo de registro.
+    - `VentanaInicial(ArbolUsuarios* arbol, QWidget *parent = nullptr)`: Constructor que recibe el árbol de usuarios.
+    - `abrirDialogoLogin()`: Abre el diálogo de inicio de sesión.
+    - `abrirDialogoRegistro()`: Abre el diálogo de registro de nuevo usuario.
+    - `toggleTema()`: Cambia entre el tema claro y oscuro de la aplicación.
 
-- **`RegistroDialog` (`registro_dialog.h/.cpp`)**: Diálogo para que un usuario existente inicie sesión. Verifica las credenciales contra el `ArbolUsuarios`.
+- **`RegistroDialog` (`registro_dialog.h/.cpp`)**: Diálogo para que un usuario existente inicie sesión.
+    - `RegistroDialog(ArbolUsuarios* arbol, QWidget *parent = nullptr)`: Constructor que recibe el árbol de usuarios.
+    - `accept()`: Slot que se ejecuta al aceptar el diálogo, valida los campos.
+    - `obtenerUsuario() const`: Devuelve el nombre de usuario ingresado.
+    - `obtenerContraseña() const`: Devuelve la contraseña ingresada.
 
-- **`DialogoRegistroNuevo` (`dialogo_registro_nuevo.h/.cpp`)**: Diálogo para registrar un nuevo usuario. Recopila los datos y crea un nuevo `perfil_usuario`.
+- **`DialogoRegistroNuevo` (`dialogo_registro_nuevo.h/.cpp`)**: Diálogo para registrar un nuevo usuario.
+    - `DialogoRegistroNuevo(ArbolUsuarios* arbol, QWidget *parent = nullptr)`: Constructor que recibe el árbol de usuarios.
+    - `accept()`: Slot que se ejecuta al aceptar el diálogo, valida los campos y registra el nuevo usuario.
 
-- **`VentanaPrincipal` (`ventana_principal.h/.cpp`)**: La ventana principal de la aplicación, visible después de iniciar sesión.
-    - `mostrarProductos(...)`: Muestra los productos en la interfaz.
-    - `actualizarRecomendaciones()`: Llama al motor de recomendaciones y actualiza la sección de productos recomendados.
-    - `on_comboBoxCategorias_currentTextChanged(...)`: Filtra los productos mostrados cuando el usuario selecciona una categoría.
-    - `on_actionVer_Perfil_triggered()`: Abre la ventana de perfil de usuario.
-    - `cambiarTema(bool oscuro)`: Cambia entre el tema claro y oscuro.
+- **`VentanaPrincipal` (`ventana_principal.h/.cpp`)**: La ventana principal de la aplicación, visible después de iniciar sesión. Muestra productos, permite filtrar, comprar, marcar como favorito y ver recomendaciones.
+    - `VentanaPrincipal(perfil_usuario& usuario, QWidget *parent = nullptr)`: Constructor que recibe el perfil del usuario actual.
+    - `mostrarProductos(const std::vector<Producto>& productosAMostrar)`: Actualiza la visualización de productos en el grid.
+    - `actualizarRecomendaciones()`: Llama al motor de recomendaciones y actualiza la lista de productos recomendados del usuario.
+    - `aplicarFiltrosYMostrarProductos()`: Aplica todos los filtros seleccionados (categoría, precio, descripción) y actualiza la vista de productos.
+    - `toggleTema()`: Cambia entre el tema claro y oscuro de la aplicación.
 
-- **`VentanaPerfil` (`ventana_perfil.h/.cpp`)**: Muestra la información del perfil del usuario, incluyendo su historial de compras y "me gusta".
+- **`VentanaPerfil` (`ventana_perfil.h/.cpp`)**: Muestra la información detallada del perfil del usuario, incluyendo sus productos comprados y favoritos.
+    - `VentanaPerfil(const perfil_usuario& perfil, const std::vector<Producto>& todosLosProductos, QWidget *parent = nullptr)`: Constructor que recibe el perfil del usuario y la lista completa de productos.
+    - `llenarTabla(QTableWidget* tabla, const ListaEnlazadaString& idsProductos, const std::vector<Producto>& todosLosProductos)`: Función auxiliar para poblar las tablas de productos comprados y favoritos.
 
-- **`PreferenciasDialogo` (`preferencias_dialogo.h/.cpp`)**: Permite al usuario ver y modificar sus categorías y marcas preferidas.
+- **`PreferenciasDialogo` (`preferencias_dialogo.h/.cpp`)**: Permite al usuario seleccionar sus categorías y marcas preferidas.
+    - `PreferenciasDialogo(QWidget *parent = nullptr)`: Constructor.
+    - `getCategoriasSeleccionadas() const`: Devuelve un vector de las categorías seleccionadas por el usuario.
+    - `getMarcasSeleccionadas() const`: Devuelve un vector de las marcas seleccionadas por el usuario.
 
 ### `main.cpp`
-El punto de entrada de la aplicación. Inicializa `QApplication` y muestra la `VentanaInicial`.
+El punto de entrada de la aplicación.
+- `main(int argc, char *argv[])`: Inicializa la aplicación Qt, carga la hoja de estilos, crea un usuario de prueba y muestra la `VentanaInicial`.
 
 ---
 
