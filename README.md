@@ -103,28 +103,33 @@ La función `recomendarProductos` utiliza una estrategia de puntuación para gen
 ## Clases, Structs y Funciones principales
 
 ### Clases Qt (Interfaz gráfica)
-- **VentanaInicial**: Ventana de bienvenida, permite iniciar sesión o registrarse.
-- **RegistroDialog**: Diálogo para login de usuario.
-- **VentanaPrincipal**: Ventana principal de la tienda, muestra productos, permite comprar, dar me gusta y ver recomendaciones.
-- **VentanaPerfil**: Muestra la información del usuario registrado.
-- **DialogoRegistroNuevo**: Diálogo para registrar un nuevo usuario.
+- **`VentanaInicial`**: Ventana de bienvenida, permite iniciar sesión o registrarse.
+- **`RegistroDialog`**: Diálogo para que un usuario existente inicie sesión.
+- **`DialogoRegistroNuevo`**: Diálogo para registrar un nuevo usuario.
+- **`VentanaPrincipal`**: Ventana principal de la tienda, muestra productos, permite filtrar, comprar, marcar como favorito y ver recomendaciones.
+- **`VentanaPerfil`**: Muestra la información detallada del perfil del usuario, incluyendo sus productos comprados y favoritos.
+- **`PreferenciasDialogo`**: Permite al usuario seleccionar sus categorías y marcas preferidas.
 
 ### Structs y estructuras de datos
-- **perfil_usuario**: Representa a un usuario, contiene datos personales, preferencias y listas enlazadas de productos comprados y favoritos.
-- **Producto**: Representa un producto de la tienda (nombre, descripción, marca, categoría, id, precio, calificación).
-- **NodoString / ListaEnlazadaString**: Implementación propia de lista enlazada simple para cadenas, usada en preferencias y en historial de interacciones.
-- **PreferenciasProducto**: Engloba las listas enlazadas de categorías y marcas preferidas por el usuario.
-- **NodoUsuario / ArbolUsuarios**: Árbol binario de búsqueda para gestionar usuarios registrados.
+- **`perfil_usuario`**: Representa a un usuario, contiene datos personales, preferencias y listas enlazadas de productos comprados y favoritos.
+- **`Producto`**: Representa un producto de la tienda (nombre, descripción, marca, categoría, id, precio, calificación).
+- **`NodoString`**: Nodo fundamental de la `ListaEnlazadaString`.
+- **`ListaEnlazadaString`**: Implementación propia de lista enlazada simple para cadenas, usada en preferencias y en historial de interacciones.
+- **`PreferenciasProducto`**: Engloba las listas enlazadas de categorías y marcas preferidas por el usuario.
+- **`NodoUsuario`**: Representa un nodo en el `ArbolUsuarios`.
+- **`ArbolUsuarios`**: Árbol binario de búsqueda para gestionar usuarios registrados.
+- **`ProductoPuntuado`**: Estructura auxiliar para almacenar productos con su puntuación, utilizada en el algoritmo de recomendación.
 
 ### Funciones principales
-- **filtrarPorCategoria**: Filtra productos por categoría.
-- **recomendarProductos**: Genera recomendaciones personalizadas según historial y preferencias del usuario.
-- **insertarUsuario / buscarUsuario / destruirArbol**: Funciones para manipular el árbol de usuarios (en la versión sin métodos miembro) o métodos en el struct ArbolUsuarios (en la versión con métodos miembro).
-- **Métodos de ListaEnlazadaString**: agregar, liberar memoria, recorrer, etc.
-- **Métodos de PreferenciasProducto**: agregarCategoria, agregarMarca.
+- **`filtrarPorCategoria`**: Filtra productos por categoría.
+- **`FiltrarPorPrecio`**: Filtra productos basándose en rangos de precios.
+- **`filtrarDescripcion`**: Filtra productos buscando una cadena en su nombre, descripción o marca.
+- **`estaEnLista`**: Función auxiliar que verifica si un ID de producto está presente en una `ListaEnlazadaString`.
+- **`recomendarProductos`**: Genera recomendaciones personalizadas según historial y preferencias del usuario.
+- **`main`**: Punto de entrada de la aplicación.
 
 ### Pruebas unitarias
-- **test_filtros.cpp**: Pruebas para la función de filtrado de productos por categoría usando Catch2.
+- **`test_filtros.cpp`**: Pruebas para las funciones de filtrado de productos usando Catch2.
 
 ---
 
