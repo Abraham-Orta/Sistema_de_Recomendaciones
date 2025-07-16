@@ -1,6 +1,13 @@
 # Sistema de Recomendaciones - Tienda en Línea
 
-Este proyecto es una aplicación de escritorio desarrollada en C++ y Qt que simula una tienda en línea con sistema de recomendaciones personalizadas para los usuarios.
+Este proyecto es una aplicación de escritorio que simula una tienda en línea con un sistema de recomendaciones personalizadas para los usuarios. La lógica del programa está desarrollada en C++ estándar, completamente separada de la interfaz de usuario. Qt se ha utilizado exclusivamente para la implementación de la interfaz gráfica de usuario (GUI).
+
+
+## Créditos
+
+- Desarrollado por Abraham Orta, Isaac Maluenga y Jhonatan Rodríguez.
+- Proyecto académico para la materia Técnicas De Programacion II.
+
 
 ## Características principales
 
@@ -52,12 +59,16 @@ Aquí se detallan las principales estructuras de datos personalizadas utilizadas
     *   **Propósito**: Define la estructura de un producto disponible en la tienda. Contiene todos los atributos relevantes para la visualización y el sistema de recomendación.
     *   **Campos clave**: `std::string nombre`, `std::string descripcion`, `std::string marca`, `std::string categoria`, `std::string id`, `std::string ruta_imagen`, `double precio`, `int calificacion`.
 
+*   **`ProductoPuntuado`**:
+    *   **Propósito**: Estructura auxiliar utilizada en el algoritmo de recomendación para almacenar un producto junto con su puntuación calculada.
+    *   **Campos clave**: `Producto producto`, `double puntuacion`.
+
 ### 2. Tabla de Funciones Asociadas a las Estructuras
 
 | Estructura de Datos | Funciones Asociadas |
 | :------------------ | :------------------ |
-| `ArbolUsuarios`     | `insertar(const perfil_usuario& perfil)`: Inserta un perfil de usuario en el árbol.<br>`buscar(const std::string& nombreUsuario)`: Busca un usuario por nombre de usuario.<br>`destruir(NodoUsuario* nodo)`: Destruye recursivamente los nodos del árbol (usado por el destructor).<br>`~ArbolUsuarios()`: Destructor, libera la memoria del árbol. |
-| `ListaEnlazadaString` | `ListaEnlazadaString()`: Constructor por defecto.<br>`ListaEnlazadaString(const ListaEnlazadaString& other)`: Constructor de copia.<br>`operator=(const ListaEnlazadaString& other)`: Operador de asignación de copia.<br>`agregar(const std::string& v)`: Añade un valor de cadena a la lista.<br>`limpiar()`: Limpia todos los elementos de la lista y libera la memoria.<br>`~ListaEnlazadaString()`: Destructor, libera la memoria de la lista. |
+| `ArbolUsuarios`     | `insertar(const perfil_usuario& perfil)`: Inserta un perfil de usuario en el árbol.<br>`buscar(const std::string& nombreUsuario)`: Busca un usuario por nombre de usuario.<br>`~ArbolUsuarios()`: Destructor, libera la memoria del árbol. |
+| `ListaEnlazadaString` | `ListaEnlazadaString()`: Constructor por defecto.<br>`ListaEnlazadaString(const ListaEnlazadaString& other)`: Constructor de copia.<br>`operator=(const ListaEnlazadaString& other)`: Operador de asignación de copia.<br>`agregar(const std::string& v)`: Añade un valor de cadena a la lista.<br>`limpiar()`: Limpia todos los elementos de la lista y libera la memoria.<br>`contiene(const std::string& valor) const`: Verifica si un valor ya existe en la lista.<br>`~ListaEnlazadaString()`: Destructor, libera la memoria de la lista. |
 | `PreferenciasProducto` | `agregarCategoria(const std::string& categoria)`: Añade una categoría a la lista de categorías preferidas.<br>`agregarMarca(const std::string& marca)`: Añade una marca a la lista de marcas preferidas. |
 
 ### 3. Análisis de cómo implemento los algoritmos de recomendación por marca y por historial de interacciones.
@@ -122,31 +133,45 @@ La función `recomendarProductos` utiliza una estrategia de puntuación para gen
 ```
 ├── include/                # Archivos de cabecera (.h)
 │   ├── arbol_usuarios.h
+│   ├── catch.hpp
 │   ├── dialogo_registro_nuevo.h
 │   ├── filtros.h
 │   ├── lista_productos.h
 │   ├── nodo_string.h
 │   ├── perfil_usuario.h
+│   ├── preferencias_dialogo.h
 │   ├── preferencias_producto.h
 │   ├── producto.h
 │   ├── recomendaciones.h
 │   ├── registro_dialog.h
 │   ├── ventana_inicial.h
 │   ├── ventana_perfil.h
-│   ├── ventana_principal.h
-│   └── catch.hpp
+│   └── ventana_principal.h
 ├── src/                    # Archivos fuente (.cpp)
 │   ├── arbol_usuarios.cpp
 │   ├── dialogo_registro_nuevo.cpp
+│   ├── filtros.cpp
 │   ├── main.cpp
+│   ├── nodo_string.cpp
+│   ├── preferencias_dialogo.cpp
+│   ├── recomendaciones.cpp
 │   ├── registro_dialog.cpp
 │   ├── test_filtros.cpp
 │   ├── ventana_inicial.cpp
 │   ├── ventana_perfil.cpp
 │   └── ventana_principal.cpp
+├── img/                    # Imágenes de productos
+│   ├── cuidado personal y belleza/
+│   ├── deportes y aire libre/
+│   ├── electronica/
+│   ├── hogar y cocina/
+│   └── moda y accesorios/
 ├── CMakeLists.txt          # Configuración de compilación
 ├── README.md               # Este archivo
-└── ...
+├── resources.qrc           # Archivo de recursos de Qt
+├── styles.qss              # Hoja de estilos para el tema oscuro
+├── styles_light.qss        # Hoja de estilos para el tema claro
+└── .git/                   # Repositorio Git
 ```
 
 ## Requisitos
@@ -182,10 +207,59 @@ El proyecto incluye pruebas unitarias con Catch2:
 ./test_filtros
 ```
 
-## Créditos
+## Descripción Detallada del Código Fuente
 
-- Desarrollado por Abraham Orta, Isaac Maluenga y Jhonatan Rodríguez.
-- Proyecto académico para la materia Técnicas De Programacion II.
+A continuación se detalla la funcionalidad de los archivos de cabecera y fuente más importantes del proyecto.
+
+### `arbol_usuarios.h` / `arbol_usuarios.cpp`
+Gestiona los perfiles de usuario utilizando un árbol binario de búsqueda para un acceso y gestión eficientes.
+- **`struct NodoUsuario`**: Representa un nodo en el árbol, conteniendo un `perfil_usuario` y punteros a los hijos.
+- **`class ArbolUsuarios`**: El árbol de búsqueda binario.
+    - `insertar(const perfil_usuario& perfil)`: Añade un nuevo usuario al árbol.
+    - `buscar(const std::string& nombreUsuario)`: Busca un usuario por su nombre de usuario.
+    - `~ArbolUsuarios()`: Libera la memoria del árbol.
+
+### `filtros.h` / `filtros.cpp`
+Contiene la lógica para filtrar productos.
+- `filtrarPorCategoria(...)`: Devuelve un vector de productos que pertenecen a una categoría específica.
+
+### `recomendaciones.h` / `recomendaciones.cpp`
+Implementa el motor de recomendaciones.
+- `recomendarProductos(...)`: Genera una lista de productos recomendados para un usuario basándose en su historial de compras, "me gusta" y preferencias.
+
+### `nodo_string.h` / `nodo_string.cpp`
+Implementa una lista enlazada simple para almacenar cadenas de texto.
+- **`struct NodoString`**: Nodo de la lista, contiene un `std::string` y un puntero al siguiente nodo.
+- **`class ListaEnlazadaString`**: La estructura de la lista enlazada.
+    - `agregar(const std::string& v)`: Añade un elemento a la lista.
+    - `contiene(const std::string& valor) const`: Verifica si un valor ya existe en la lista.
+    - `limpiar()`: Elimina todos los nodos de la lista.
+
+### Clases de la Interfaz Gráfica (UI)
+
+- **`VentanaInicial` (`ventana_inicial.h/.cpp`)**: Es la primera ventana que ve el usuario. Ofrece las opciones de iniciar sesión o registrarse.
+    - `on_loginButton_clicked()`: Abre el diálogo de inicio de sesión.
+    - `on_registerButton_clicked()`: Abre el diálogo de registro.
+
+- **`RegistroDialog` (`registro_dialog.h/.cpp`)**: Diálogo para que un usuario existente inicie sesión. Verifica las credenciales contra el `ArbolUsuarios`.
+
+- **`DialogoRegistroNuevo` (`dialogo_registro_nuevo.h/.cpp`)**: Diálogo para registrar un nuevo usuario. Recopila los datos y crea un nuevo `perfil_usuario`.
+
+- **`VentanaPrincipal` (`ventana_principal.h/.cpp`)**: La ventana principal de la aplicación, visible después de iniciar sesión.
+    - `mostrarProductos(...)`: Muestra los productos en la interfaz.
+    - `actualizarRecomendaciones()`: Llama al motor de recomendaciones y actualiza la sección de productos recomendados.
+    - `on_comboBoxCategorias_currentTextChanged(...)`: Filtra los productos mostrados cuando el usuario selecciona una categoría.
+    - `on_actionVer_Perfil_triggered()`: Abre la ventana de perfil de usuario.
+    - `cambiarTema(bool oscuro)`: Cambia entre el tema claro y oscuro.
+
+- **`VentanaPerfil` (`ventana_perfil.h/.cpp`)**: Muestra la información del perfil del usuario, incluyendo su historial de compras y "me gusta".
+
+- **`PreferenciasDialogo` (`preferencias_dialogo.h/.cpp`)**: Permite al usuario ver y modificar sus categorías y marcas preferidas.
+
+### `main.cpp`
+El punto de entrada de la aplicación. Inicializa `QApplication` y muestra la `VentanaInicial`.
+
+---
 
 ## Licencia
 
